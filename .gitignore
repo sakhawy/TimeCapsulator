@@ -1,0 +1,8 @@
+.vscode
+backend/venv/
+backend/conf/.env
+backend/conf/db.sqlite3
+backend/conf/media/
+backend/conf/conf/__pycache__/
+backend/conf/capsulator/__pycache__/
+backend/conf/capsulator/migrations/
