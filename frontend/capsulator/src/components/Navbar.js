@@ -6,10 +6,10 @@ function Navbar() {
               <img src="./logo.png" alt="" className="h-full"/>
             </div>
             <div class="h-full lg:w-80 bg-gray-500 flex-grow flex items-center justify-center">
-              <p1 class="text-secondary text-4xl font-bold">Logo</p1>
+              <p1 class="text-secondary text-2xl md:text-4xl font-bold">Logo</p1>
             </div>
             <div class="h-full lg:w-80 bg-gray-500 flex-grow flex items-center justify-center">
-              <p1 class="text-secondary text-4xl font-bold">Logo</p1>
+              <p1 class="text-secondary text-2xl md:text-4xl font-bold">Logo</p1>
             </div>
 
           </div>

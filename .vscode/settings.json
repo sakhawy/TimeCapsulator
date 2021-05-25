@@ -1,3 +1,6 @@
 {
-    "python.pythonPath": "backend/venv/bin/python3.9"
+    "python.pythonPath": "backend/venv/bin/python3.9",
+    "emmet.includeLanguages": {
+        "javascript": "javascriptreact"
+    }
 }
