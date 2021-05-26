@@ -1,8 +1,12 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit'
 
+import {instance as axios} from "../api/axios"
+import endpoints from "../api/endpoints"
+
 const initialState = {
     user: {},
-    state: null
+    status: null, // pending, fulfilled, rejected
+    errorData: null
 }
 
 export const authenticate = createAsyncThunk(
@@ -10,42 +14,60 @@ export const authenticate = createAsyncThunk(
     async({ token }, thunkAPI) => {
         try {
             // Authenticate
-            const response = await fetch(
-                'http://localhost:8000/auth/convert-token',
+            const response = await axios({
+                url: endpoints.auth,
+                method: 'POST',
+                data:
                 {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        grant_type: "convert_token",
-                        client_id: process.env.REACT_APP_CLIENT_ID,
-                        client_secret: process.env.REACT_APP_CLIENT_SECRET,
-                        backend: "google-oauth2",
-                        token: token,
-                    }),
-                }
-            );
+                    grant_type: "convert_token",
+                    client_id: process.env.REACT_APP_CLIENT_ID,
+                    client_secret: process.env.REACT_APP_CLIENT_SECRET,
+                    backend: "google-oauth2",
+                    token: token,
+                },
+            });
+            if (response.status === 200){
 
-            let data = await response.json();
-            console.log("data", data);
+                const access_token = response.data.access_token
+
+                localStorage.setItem("access_token", response.data.access_token)
+                return response.data
+            }
+            else
+                return thunkAPI.rejectWithValue(response.data)
         } 
-        catch {
-            // Error
+        catch (e) {
+            return thunkAPI.rejectWithValue({data: e.response.data, status: e.response.status})
         }
     }
 )
 
-export const navbarSlice = createSlice({
+export const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
+        setToken: (state, action) => {
+            state.user.access_token = action.payload 
+        }
+    },
+    extraReducers: {
+        [authenticate.pending]: (state) => {
+            state.status = 'pending'
+        },
+        [authenticate.fulfilled]: (state, {payload}) => {
+            state.status = 'fulfilled'
+            state.user = payload
+        },
+        [authenticate.rejected]: (state, {payload}) => {
+            state.status = 'rejected'
+            state.errorData = payload
+        },
+
     }
 })
 
-export const selectActiveTab = (state) => state.navbar.activeTab
+export const selectUser = (state) => state.auth.user
 
-export const {changeTab} = navbarSlice.actions
+export const {setToken} = authSlice.actions
 
-export default navbarSlice.reducer;
+export default authSlice.reducer;

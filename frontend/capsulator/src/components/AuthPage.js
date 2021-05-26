@@ -16,12 +16,10 @@ function AuthPage() {
     }
 
     function loginFailure(response){
-        console.log("ERR")
-        console.log(response)
     }
 
     return (
-        <div className="flex flex-col bg-secondary items-center justify-center h-48 sm:min-h-0 rounded-b-2xl p-4 rounded-tl-2xl">
+        <div className="flex flex-col bg-secondary items-center justify-center h-64 sm:min-h-0 rounded-b-2xl p-4">
             <div className="flex-grow flex justify-center items-center">    
                 <h1 className="text-2xl font-bold md:text-3xl md:font-extrabold text-primary ">Sign Up / Login</h1>
             </div>
