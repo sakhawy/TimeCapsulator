@@ -2,7 +2,7 @@ function LandingPage() {
     return (
         <div>
             {/* About TimeCapsulator */}
-            <div className="flex flex-col min-h-0 h-48 justify-center items-center bg-secondary rounded-b-2xl p-4">
+            <div className="flex flex-col min-h-0 h-48 justify-center items-center bg-secondary rounded-b-2xl rounded-tr-2xl p-4">
                 <div className="flex justify-center items-center felx-grow">    
                     <h1 className="text-2xl font-bold md:text-3xl md:font-extrabold text-primary">Time Capsulator</h1>
                 </div>

@@ -3,6 +3,8 @@ import LandingPage from './components/LandingPage';
 import Navbar from './components/Navbar'
 
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom"
+import React from 'react';
+import AuthPage from './components/AuthPage';
 
 function App() {
   return (
@@ -16,11 +18,11 @@ function App() {
           </div>
           {/* body */}
           <div className="rounded-b-2xl">
-
-            {/* Landing page */}
-            <LandingPage />
-
-
+            {/* Routing */}
+              <Switch>
+                <Route path="/auth" component={AuthPage} />
+                <Route exact={true} path="/" component={LandingPage} />
+              </Switch>
           </div>
         </div>
       </div>
