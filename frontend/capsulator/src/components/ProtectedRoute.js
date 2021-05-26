@@ -4,15 +4,18 @@ import {Route, Redirect} from 'react-router-dom'
 
 import {selectUser} from '../store/authSlice'
 
-function ProtectedRoute(props) {
+function ProtectedRoute({redirection, component: Component}) {
     const user = useSelector(selectUser) 
     return (
-        <div>
-            {user.access_token && <Route {...props}/> }
-            
-            {!user.access_token && <Redirect to={props.redirection} />}
-            
-        </div>
+        <Route render={() => {
+            if (!user.access_token){
+                return <Redirect to={redirection} />
+            }   
+            else{ 
+                return <Component />
+            }
+        }}/>
+        
     )
 }
 

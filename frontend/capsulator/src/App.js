@@ -1,13 +1,13 @@
 import './App.css';
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom"
 import {React, useEffect} from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import LandingPage from './components/LandingPage';
 import Navbar from './components/Navbar'
 import AuthPage from './components/AuthPage';
 import ProtectedRoute from './components/ProtectedRoute';
-import {setToken} from './store/authSlice';
+import {authenticate, selectUser, setToken, selectAuthStatus} from './store/authSlice';
 import Dashboard from './components/Dashboard';
 import Logout from './components/Logout';
 
@@ -22,11 +22,24 @@ function App() {
 
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    const access_token = localStorage.getItem("access_token")
-    if (access_token)
-      dispatch(setToken(access_token))
-  }, [])
+  const user = useSelector(selectUser)
+  const authStatus = useSelector(selectAuthStatus)
+
+  useEffect(() => {   
+    dispatch(authenticate({token: null}))
+  }, [user.access_token])
+
+  // Waiting for token to be fetched
+  // Without this we'll be constantly redirected in ProtectedRoute
+  // This shall be the MainLoader
+  if (authStatus === 'pending'){
+    return (
+      <div>
+        {/* Style later */}
+        LOADING :)
+      </div>
+    )
+  }
 
   return (
     <Router>

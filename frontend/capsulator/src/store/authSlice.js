@@ -5,7 +5,7 @@ import endpoints from "../api/endpoints"
 
 const initialState = {
     user: {},
-    status: null, // pending, fulfilled, rejected
+    status: 'pending', // pending, fulfilled, rejected
     errorData: null
 }
 
@@ -13,6 +13,13 @@ export const authenticate = createAsyncThunk(
     'auth/authenticate',
     async({ token }, thunkAPI) => {
         try {
+            // Try to authenticate from localStorage
+            if (token === null){
+                const access_token = localStorage.getItem("access_token")
+                if (access_token)
+                    return { access_token: access_token }
+            } 
+
             // Authenticate
             const response = await axios({
                 url: endpoints.auth,
@@ -67,6 +74,8 @@ export const authSlice = createSlice({
 })
 
 export const selectUser = (state) => state.auth.user
+
+export const selectAuthStatus = (state) => state.auth.status
 
 export const {setToken} = authSlice.actions
 
