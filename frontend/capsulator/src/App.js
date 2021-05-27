@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import {authenticate, selectUser, setToken, selectAuthStatus} from './store/authSlice';
 import Dashboard from './components/DashboardPage';
 import Logout from './components/Logout';
+import Create from './components/Create';
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
     LandingPage: "/",
     AuthPage: "/auth",
     Dashboard: "/dashboard",
+    Create: "/create",
     Logout: "/logout"
   }
 
@@ -74,6 +76,12 @@ function App() {
 
                   {
                     image: "./logo.png",
+                    title: "Create",
+                    link: routes.Create,
+                    authState: 1
+                  },
+                  {
+                    image: "./logo.png",
                     title: "Logout",
                     link: routes.Logout,
                     authState: 1
@@ -92,6 +100,7 @@ function App() {
                 <ProtectedRoute exact={true} path={`${routes.LandingPage}`} component={LandingPage} redirection={`${routes.Dashboard}`} authRequired={false}  />
                 <ProtectedRoute path={`${routes.Dashboard}`} component={Dashboard} redirection={`${routes.LandingPage}`}/>
                 <ProtectedRoute path={`${routes.Logout}`} component={Logout} redirection={`${routes.AuthPage}`}/>
+                <ProtectedRoute path={`${routes.Create}`} component={Create} redirection={`${routes.AuthPage}`}/>
               </Switch>
           </div>
         </div>
