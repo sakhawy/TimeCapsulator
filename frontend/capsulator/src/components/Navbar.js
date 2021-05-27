@@ -1,27 +1,23 @@
-import {useState} from 'react'
-import {Link} from "react-router-dom";
-import {useSelector, useDispatch} from 'react-redux'
+import {useEffect, useState} from 'react'
+import {Link, useHistory} from "react-router-dom";
+import {useSelector} from 'react-redux'
 import classname from 'classnames'
 
-import {
-  changeTab,
-  selectActiveTab
-} from '../store/navbarSlice'
 import { selectUser } from '../store/authSlice';
 
-function NavbarItem({image, title, index, activeIndex, changeActiveTab, link}){
+function NavbarItem({image, title, activeTab, changeActiveTab, link}){
   return (
     <Link 
       className={
         classname(
           "h-full lg:w-80 bg-gray-500 flex-grow flex items-center justify-center rounded-t-xl", 
           {
-            "text-secondary": activeIndex !== index,
-            "text-primary bg-secondary": activeIndex === index
+            "text-secondary": activeTab !== link,
+            "text-primary bg-secondary": activeTab === link
         })
       }
       to={`${link}`}
-      onClick={() => changeActiveTab(index)}
+      onClick={() => changeActiveTab(link)}
     >
       <div className="h-full" >
         <img src={`${image}`} title={`${title}`} className="h-full"/>
@@ -31,17 +27,21 @@ function NavbarItem({image, title, index, activeIndex, changeActiveTab, link}){
 }
 
 function Navbar({items}) {
-  const activeTab = useSelector(selectActiveTab)
-
-  const dispatch = useDispatch()
 
   // Choose which page is active right now
-  const [active, setActive] = useState(0)
+  const [activeTab, setActiveTab] = useState(null)
 
+  // Needed for choosing wheather we're keeping or ditching the tab 
   const user = useSelector(selectUser)
 
+  const history = useHistory()
+
+  useEffect(() => {
+    setActiveTab(history.location.pathname)
+  }, [history.location.pathname])
+
   function changeActiveTab(tab){
-    dispatch(changeTab(tab))
+    setActiveTab(tab)
   }
   
   return (
@@ -60,8 +60,7 @@ function Navbar({items}) {
               return <NavbarItem
                 image={item.image}
                 title={item.title}
-                index={items.indexOf(item)}
-                activeIndex={activeTab}
+                activeTab={activeTab}
                 changeActiveTab={changeActiveTab}
                 link={item.link}
                 key={items.indexOf(item)}

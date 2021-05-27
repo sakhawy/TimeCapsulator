@@ -15,6 +15,8 @@ function AuthPage() {
 
     useEffect(() => {
         // Do this after the authentication dispatch
+        // NOTE: This won't work if the user changed directory before login is done
+
         if (user.access_token){
             history.push("/dashboard")
         }

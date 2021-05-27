@@ -89,7 +89,7 @@ function App() {
             {/* Routing */}
               <Switch>
                 <Route path={`${routes.AuthPage}`} component={AuthPage} />
-                <Route exact={true} path={`${routes.LandingPage}`} component={LandingPage} />
+                <ProtectedRoute exact={true} path={`${routes.LandingPage}`} component={LandingPage} redirection={`${routes.Dashboard}`} authRequired={false}  />
                 <ProtectedRoute path={`${routes.Dashboard}`} component={Dashboard} redirection={`${routes.LandingPage}`}/>
                 <ProtectedRoute path={`${routes.Logout}`} component={Logout} redirection={`${routes.AuthPage}`}/>
               </Switch>
