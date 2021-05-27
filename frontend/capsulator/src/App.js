@@ -8,7 +8,7 @@ import Navbar from './components/Navbar'
 import AuthPage from './components/AuthPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import {authenticate, selectUser, setToken, selectAuthStatus} from './store/authSlice';
-import Dashboard from './components/Dashboard';
+import Dashboard from './components/DashboardPage';
 import Logout from './components/Logout';
 
 function App() {
@@ -45,7 +45,7 @@ function App() {
     <Router>
       <div className="bg-primary min-h-screen p-6">
         {/* skeleton */}
-        <div className="md:w-5/6 m-auto h-full">
+        <div className="md:w-5/6 m-auto">
           {/* navbar */}
           <div className="h-20 bg-red-100">
             <Navbar
@@ -85,7 +85,7 @@ function App() {
             ></Navbar>
           </div>
           {/* body */}
-          <div className="rounded-b-2xl">
+          <div className="rounded-b-2xl h-full">
             {/* Routing */}
               <Switch>
                 <Route path={`${routes.AuthPage}`} component={AuthPage} />

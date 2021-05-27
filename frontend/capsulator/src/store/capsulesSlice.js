@@ -63,7 +63,9 @@ export const capsulesSlice = createSlice({
     }
 }) 
 
-export const selectCapsules = (state) => state.capsules.entites // Not the whole capsules
+export const selectCapsulesIds = (state) => state.capsules.ids // Not the whole capsules
+export const selectCapsules = (state) => state.capsules.entities // Not the whole capsules
+export const selectCapsulesStatus = (state) => state.capsules.status // Not the whole capsules
 
 export const {addCapsule, updateCapsule, setCapsules} = capsulesSlice.actions
 
