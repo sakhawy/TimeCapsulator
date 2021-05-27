@@ -27,7 +27,7 @@ function App() {
 
   useEffect(() => {   
     dispatch(authenticate({token: null}))
-  }, [user.access_token])
+  }, [])
 
   // Waiting for token to be fetched
   // Without this we'll be constantly redirected in ProtectedRoute

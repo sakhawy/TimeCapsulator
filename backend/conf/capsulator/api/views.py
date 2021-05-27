@@ -69,7 +69,13 @@ class ResourceList(APIView):
         return Response(resource_serializer.data, status=status.HTTP_200_OK)
 
 class CapsuleList(APIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, serializers.IsCapsuleAdmin]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get(self, request, format=None):
+        """Get users's capsules"""
+        member_capsules = [x.capsule for x in models.Member.objects.filter(user=request.user)] 
+        capsule_serializer = serializers.CapsuleSerializer(member_capsules, many=True)
+        return Response(capsule_serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
         """Create capsule"""
