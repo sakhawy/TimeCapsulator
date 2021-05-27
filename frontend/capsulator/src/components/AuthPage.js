@@ -1,18 +1,31 @@
 import {useDispatch, useSelector} from 'react-redux'
 import GoogleLogin from 'react-google-login'
 
-import {authenticate} from '../store/authSlice'
+import {authenticate, selectUser} from '../store/authSlice'
+import { Redirect, useHistory } from 'react-router'
+import { useEffect } from 'react'
 
 function AuthPage() {
 
     const dispatch = useDispatch()
+
+    const history = useHistory()
+    
+    const user = useSelector(selectUser)
+
+    useEffect(() => {
+        // Do this after the authentication dispatch
+        if (user.access_token){
+            history.push("/dashboard")
+        }
+    }, [user])
+
 
     function loginSuccess(response){
         // dispatch(authenticate(response))
         dispatch(authenticate({
             token: response.accessToken
         }))
-
     }
 
     function loginFailure(response){
