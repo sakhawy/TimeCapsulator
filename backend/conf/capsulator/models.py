@@ -83,10 +83,11 @@ class Capsule(models.Model):
     name = models.CharField(max_length=100)
     # Capsule will be accesible by the (ID and KEY)
     key = models.CharField(max_length=KEY_LENGTH, blank=True, null=True)
-    state = models.IntegerField(choices=STATES, default=CREATED)
+    state = models.IntegerField(choices=STATES, default=CREATED, blank=True, null=True)
     creation_date = models.DateTimeField(blank=True, null=True)
     locking_date = models.DateTimeField(blank=True, null=True)
     unlocking_date = models.DateTimeField(blank=True, null=True)
+    public = models.BooleanField(False)
 
     def save(self, *args, **kwargs):
         if not self.id:

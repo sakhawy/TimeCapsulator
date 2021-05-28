@@ -126,7 +126,7 @@ function Dashboard() {
                     unlockDate={capsules[modalCapsuleId].unlock_date}
                     creators={capsules[modalCapsuleId].members}    
                 />}
-            <div className="bg-secondary h-128 rounded-b-2xl p-6 space-y-2">
+            <div className="bg-secondary min-h-128 rounded-b-2xl p-6 space-y-2">
                 {
                     capsulesStatus === 'pending' && !capsules &&
                         

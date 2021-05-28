@@ -48,7 +48,8 @@ export const createCapsule = createAsyncThunk(
                 data: {
                     name: data.name,
                     unlock_date: data.unlockDate,
-                    member: data.member
+                    member: data.member,
+                    public: data.public
                 }
             });
             if (response.status === 201){

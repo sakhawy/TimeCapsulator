@@ -90,7 +90,7 @@ class UserSerializer(serializers.ModelSerializer):
 class CapsuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Capsule
-        fields = ["id", "key", "name", "state", "creation_date", "locking_date", "unlocking_date", "members"]
+        fields = ["id", "key", "name", "state", "public", "creation_date", "locking_date", "unlocking_date", "members"]
 
     members = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     lookup_key = "key"
@@ -125,7 +125,7 @@ class MemberSerializer(serializers.ModelSerializer):
                 message="User is already registered in the capsule."
             )
         ]
-    state = AdminOnlyField()
+    state = AdminOnlyField(required=False)
     
     def validate_state(self, value):
         # Validation for illegal action

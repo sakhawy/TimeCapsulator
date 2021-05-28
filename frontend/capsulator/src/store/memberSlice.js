@@ -23,8 +23,7 @@ export const joinCapsule = createAsyncThunk(
                     user: profile.id,
                     capsule: capsuleId,
                     key: capsuleKey,
-                    state: 'W',
-                    status: 'N'
+
 
                 }
             });
@@ -66,6 +65,7 @@ export const memberSlice = createSlice({
         [joinCapsule.fulfilled]: (state, action) => {
             state.status = 'fulfilled'
             memberAdapter.addOne(state.entities, action.payload)
+            // TODO: Update the capsule
             
         },
         [joinCapsule.rejected]: (state, action) => {
