@@ -1,11 +1,23 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import classname from 'classnames'
+import { useDispatch, useSelector } from "react-redux"
+import { createCapsule } from "../store/capsulesSlice"
+import { fetchProfile, selectProfile } from "../store/profileSlice"
 
 function Create() {
     const [shareButton, setShareButton] = useState(0)
     const [publicButton, setPublicButton] = useState(0)
     const [name, setName] = useState("")
     const [unlockDate, setUnlockDate] = useState("")
+
+    const profile = useSelector(selectProfile)
+
+    const dispatch = useDispatch()
+
+    function handleCreateCapsule(){
+        dispatch(createCapsule({name: "test", unlockDate: '2000-11-11', member: profile.id}))
+    }
+
     return (
         <div className="bg-secondary h-128 rounded-b-2xl p-4 ">
             <div className="flex flex-col space-y-2">
@@ -63,7 +75,7 @@ function Create() {
                 <div className="flex flex-col flex-grow w-full items-center justify-center h-16">
                     <button 
                         className="rounded-md bg-primary text-secondary w-full h-full font-bold text-2xl"
-                        onClick={() => setPublicButton(!publicButton)} 
+                        onClick={handleCreateCapsule} 
                     >Create</button>
                 </div>
             </div>

@@ -6,7 +6,7 @@ import endpoints from "../api/endpoints"
 const initialState = {
     user: {},
     status: 'pending', // pending, fulfilled, rejected
-    errorData: null
+    error: null
 }
 
 export const authenticate = createAsyncThunk(
@@ -70,7 +70,7 @@ export const authSlice = createSlice({
         },
         [authenticate.rejected]: (state, {payload}) => {
             state.status = 'rejected'
-            state.errorData = payload
+            state.error = payload
         },
         
         [loadToken.pending]: (state) => {

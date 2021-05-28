@@ -11,6 +11,7 @@ import {authenticate, selectUser, setToken, selectAuthStatus, loadToken} from '.
 import Dashboard from './components/DashboardPage';
 import Logout from './components/Logout';
 import Create from './components/Create';
+import { fetchProfile } from './store/profileSlice';
 
 function App() {
 
@@ -28,9 +29,14 @@ function App() {
   const authStatus = useSelector(selectAuthStatus)
 
   useEffect(() => {   
-    dispatch(loadToken())
-  }, [])
-
+    if (!user.access_token){
+      dispatch(loadToken())
+    } else {
+      // Access token has to be available
+      dispatch(fetchProfile())
+    }
+  }, [user.access_token])
+  
   // Waiting for token to be fetched
   // Without this we'll be constantly redirected in ProtectedRoute
   // This shall be the MainLoader

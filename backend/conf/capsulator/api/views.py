@@ -60,6 +60,12 @@ class UserList(APIView):
     
         return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class UserDetail(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, format=None):
+        user_serializer = serializers.UserSerializer(request.user)
+        return Response(user_serializer.data, status=status.HTTP_200_OK)
+
 class ResourceList(APIView):
     ### ADD META
     def post(self, request, format=None):
@@ -156,7 +162,11 @@ class MemberList(APIView):
         # Creation must be restricted to the current user
         member_data["user"] = request.user.id
 
-        member_serializer = serializers.MemberSerializer(data=member_data)
+        member_serializer = serializers.MemberSerializer(
+            data=member_data,
+            context={'request': request}
+        )
+        
         if member_serializer.is_valid():
             member_serializer.save()
             return Response(member_serializer.data, status=status.HTTP_201_CREATED)

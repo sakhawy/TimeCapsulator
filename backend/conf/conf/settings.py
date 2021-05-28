@@ -142,7 +142,7 @@ REST_FRAMEWORK = {
 }
 
 AUTHENTICATION_BACKENDS = [
-    # 'capsulator.backends.EmailBackend',
+    'capsulator.backends.EmailBackend',
 ]
 
 

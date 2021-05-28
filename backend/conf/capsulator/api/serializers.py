@@ -59,7 +59,8 @@ class TokenSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
-        fields = ["id", "username", "email", "password", "token", "is_active"]
+        # fields = ["id", "username", "email", "password", "token", "is_active"]
+        fields = ["id", "username", "email", "password", "is_active"]
         # lookup_field = "username"
 
     def create(self, validated_data):
@@ -83,7 +84,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     # Nested token serializer for user creations.
-    token = TokenSerializer(source="auth_token", read_only=True)
+    # token = TokenSerializer(source="auth_token", read_only=True)
 
 
 class CapsuleSerializer(serializers.ModelSerializer):
@@ -91,7 +92,7 @@ class CapsuleSerializer(serializers.ModelSerializer):
         model = models.Capsule
         fields = ["id", "key", "name", "state", "creation_date", "locking_date", "unlocking_date", "members"]
 
-    members = serializers.PrimaryKeyRelatedField(many=True, queryset=models.Member.objects.all())
+    members = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     lookup_key = "key"
 
     def validate_state(self, value):

@@ -6,6 +6,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
     path('authenticate/', views.authenticate),
+    path('profile/', views.UserDetail.as_view()),
     path('capsule/', views.CapsuleList.as_view()),
     path('capsule/<int:key>/', views.CapsuleDetail.as_view()),
     path('member/', views.MemberList.as_view()),
