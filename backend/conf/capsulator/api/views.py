@@ -3,34 +3,53 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from capsulator.api import serializers
 from rest_framework.views import APIView
-
 from rest_framework import permissions
-
 from rest_framework import exceptions
+from rest_framework.authtoken.models import Token
 
 from django.http import Http404
+from django.conf import settings
+
+# Google auth
+from google.oauth2 import id_token
+from google.auth.transport import requests 
 
 from capsulator import models, tokens
 
 @api_view(["POST"])
-def activate_user(request, id, token):
+def authenticate(request):
+    "This is a temporary way of implementing Google OAuth2. Will be deleted once I manage to do it the proper way."
+    # Check if the email exists in the database. Create a user if not. Then return a toke. 
     try:
-        user = models.User.objects.get(id=id)
+        client_id = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
+        idinfo = id_token.verify_oauth2_token(request.data['code'], requests.Request(), client_id)
+        
+        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+            return Response({'detail': 'Wrong issuer'}, status=status.HTTP_400_BAD_REQUEST)
 
     except:
-        user = None
+        return Response({'detail': 'Bad authorization code.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    if user != None:
-        # Check if token is valid.
-        if tokens.account_activation_token.check_token(user, token):
-            user.is_active = True
-            user.save()
-            token = user.auth_token
-            print(token)
-            token_serializer = serializers.TokenSerializer(token)
-            return Response(token_serializer.data, status=status.HTTP_200_OK)
+    try:
+        user = models.User.objects.get(email=idinfo['email'])
+        
+    except:
+        user = models.User(
+            first_name=idinfo['given_name'],
+            last_name=idinfo['family_name'],
+            username=idinfo['email'].split("@")[0],
+            email=idinfo['email']
+        )
+        user.save()
+    
+    try:
+        token = user.auth_token
+    except:
+        token = Token.objects.create(user=user)
 
-    raise exceptions.APIException('Invalid Data')
+    token_serializer = serializers.TokenSerializer(token)
+    return Response(token_serializer.data, status=status.HTTP_200_OK)
+    
 
 class UserList(APIView):
     def post(self, request, format=None):
@@ -69,10 +88,11 @@ class ResourceList(APIView):
         return Response(resource_serializer.data, status=status.HTTP_200_OK)
 
 class CapsuleList(APIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, format=None):
         """Get users's capsules"""
+        # NOTE: change this if you're going to use it to retrieve public capsules
         member_capsules = [x.capsule for x in models.Member.objects.filter(user=request.user)] 
         capsule_serializer = serializers.CapsuleSerializer(member_capsules, many=True)
         return Response(capsule_serializer.data, status=status.HTTP_200_OK)
@@ -86,7 +106,8 @@ class CapsuleList(APIView):
         return Response(capsule_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CapsuleDetail(APIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, serializers.IsCapsuleAdmin]
+    permission_classes = [serializers.IsCapsuleAdmin, permissions.IsAuthenticatedOrReadOnly]
+
     def put(self, request, key, format=None):
         try:
             capsule = models.Capsule.objects.get(key=key)

@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls import url
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -22,9 +23,6 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('capsulator.urls')),
-
-    # drf_social_oauth2 urls
-    path('auth/', include('drf_social_oauth2.urls', namespace='drf'))
 ]
 
 if settings.DEBUG:

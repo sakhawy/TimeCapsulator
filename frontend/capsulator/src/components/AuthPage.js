@@ -26,7 +26,7 @@ function AuthPage() {
     function loginSuccess(response){
         // dispatch(authenticate(response))
         dispatch(authenticate({
-            token: response.accessToken
+            code: response.tokenId
         }))
     }
 
@@ -44,6 +44,7 @@ function AuthPage() {
                     render={props => (
                         <button onClick={props.onClick} disabled={props.disabled} className="rounded-md bg-primary text-secondary min-w-full min-h-full font-bold text-2xl">With Google</button>
                     )}
+                    accessType="offline"
                     onSuccess={loginSuccess}
                     onFailure={loginFailure} 
                     cookiePolicy={'single_host_origin'}

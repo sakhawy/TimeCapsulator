@@ -1,6 +1,6 @@
 const endpoints = {
-    auth: "/auth/convert-token",
-    capsules: "/api/capsule"
+    auth: "/api/authenticate/",
+    capsules: "/api/capsule/"
 
 }
 

@@ -7,7 +7,7 @@ import LandingPage from './components/LandingPage';
 import Navbar from './components/Navbar'
 import AuthPage from './components/AuthPage';
 import ProtectedRoute from './components/ProtectedRoute';
-import {authenticate, selectUser, setToken, selectAuthStatus} from './store/authSlice';
+import {authenticate, selectUser, setToken, selectAuthStatus, loadToken} from './store/authSlice';
 import Dashboard from './components/DashboardPage';
 import Logout from './components/Logout';
 import Create from './components/Create';
@@ -28,7 +28,7 @@ function App() {
   const authStatus = useSelector(selectAuthStatus)
 
   useEffect(() => {   
-    dispatch(authenticate({token: null}))
+    dispatch(loadToken())
   }, [])
 
   // Waiting for token to be fetched

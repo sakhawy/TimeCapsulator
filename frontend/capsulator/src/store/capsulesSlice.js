@@ -16,7 +16,7 @@ export const fetchCapsules = createAsyncThunk(
                 url: endpoints.capsules,
                 method: 'GET',
                 headers: {
-                    'Authorization': `Token fc19a4cea8c56144716879ded704efa97f76adfc`
+                    'Authorization': `Token ${user.access_token}`
                 },
             });
             if (response.status === 200){

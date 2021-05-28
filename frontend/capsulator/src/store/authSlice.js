@@ -11,37 +11,24 @@ const initialState = {
 
 export const authenticate = createAsyncThunk(
     'auth/authenticate',
-    async({ token }, thunkAPI) => {
+    async({ code }, thunkAPI) => {
         try {
-            // Try to authenticate from localStorage
-            if (token === null){
-                const access_token = localStorage.getItem("access_token")
-                if (access_token)
-                    return { access_token: access_token }
-                
-                // Don't continue
-                return {}
-            } 
-
             // Authenticate
             const response = await axios({
                 url: endpoints.auth,
                 method: 'POST',
                 data:
                 {
-                    grant_type: "convert_token",
-                    client_id: process.env.REACT_APP_CLIENT_ID,
-                    client_secret: process.env.REACT_APP_CLIENT_SECRET,
-                    backend: "google-oauth2",
-                    token: token,
+                    code: code,
                 },
             });
             if (response.status === 200){
+                // TODO: Add formatter
+                const access_token = response.data.key
 
-                const access_token = response.data.access_token
-
-                localStorage.setItem("access_token", response.data.access_token)
-                return response.data
+                localStorage.setItem("access_token", access_token)
+                
+                return {access_token: response.data.key}
             }
             else
                 return thunkAPI.rejectWithValue(response.data)
@@ -49,6 +36,15 @@ export const authenticate = createAsyncThunk(
         catch (e) {
             return thunkAPI.rejectWithValue({data: e.response.data, status: e.response.status})
         }
+    }
+)
+
+export const loadToken = createAsyncThunk(
+    'auth/loadToken',
+    async (_, thunkAPI) => {
+        const access_token = localStorage.getItem("access_token")
+        if (access_token)
+            return access_token
     }
 )
 
@@ -70,11 +66,25 @@ export const authSlice = createSlice({
         [authenticate.fulfilled]: (state, {payload}) => {
             state.status = 'fulfilled'
             state.user = payload
+            
         },
         [authenticate.rejected]: (state, {payload}) => {
             state.status = 'rejected'
             state.errorData = payload
         },
+        
+        [loadToken.pending]: (state) => {
+            state.status = 'pending'
+        },
+        [loadToken.fulfilled]: (state, {payload}) => {
+            state.status = 'fulfilled'
+            state.user.access_token = payload
+            
+        },
+        [loadToken.rejected]: (state, {payload}) => {
+            state.status = 'rejected'
+        },
+        
 
     }
 })

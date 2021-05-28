@@ -167,7 +167,6 @@ def handle_membership(sender, instance, created, **kwargs):
     Automatically make the first Member instance to join a Capsule an admin
     '''
     if created:
-        print (instance.id)
         # First capsule member is automatically an admin
         # TODO: Handle when admin leaves
         if len(instance.capsule.members.all()) == 1: 
