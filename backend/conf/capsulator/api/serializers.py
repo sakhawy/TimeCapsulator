@@ -87,12 +87,49 @@ class UserSerializer(serializers.ModelSerializer):
     # token = TokenSerializer(source="auth_token", read_only=True)
 
 
+class MemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Member
+        fields = ["id", "user", "capsule", "state", "status", "user_name"]
+
+        # API exception for when user creates 2 Member instances.
+        validators = [
+            UniqueTogetherValidator(
+                queryset=model.objects.all(),
+                fields=['user', 'capsule'],
+                message="User is already registered in the capsule."
+            )
+        ]
+
+    state = AdminOnlyField(required=False)
+    user_name = serializers.SerializerMethodField('get_user_name')
+
+    def get_user_name(self, member):
+        return f"{member.user.first_name} {member.user.last_name}"
+
+    def validate_state(self, value):
+        # Validation for illegal action
+        if not self.instance:
+            if value != models.Member.WAITING:
+                raise serializers.ValidationError("Illegal action. Unauthorized.")
+        
+        ## This is kind of useless :)
+        # else:
+        #     print(self.instance.state)
+        #     # New state can't be admin. 
+        #     # New state can't be equal to old state.
+        #     if value == models.Member.ADMIN or value == self.instance.state:
+        #         raise serializers.ValidationError("Illegal action. Unauthorized or duplicated.")
+        
+        return value
+
 class CapsuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Capsule
-        fields = ["id", "key", "name", "state", "public", "creation_date", "locking_date", "unlocking_date", "members"]
+        fields = ["id", "key", "name", "state", "is_public", "creation_date", "locking_date", "unlocking_date", "members"]
 
-    members = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    # Capsule can return its members in the response
+    members = MemberSerializer(read_only=True, many=True)
     lookup_key = "key"
 
     def validate_state(self, value):
@@ -111,34 +148,3 @@ class FileSerializer(serializers.ModelSerializer):
         model = models.File
         fields = ["id", "resource", "content"]
     
-
-class MemberSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Member
-        fields = ["id", "user", "capsule", "state", "status"]
-
-        # API exception for when user creates 2 Member instances.
-        validators = [
-            UniqueTogetherValidator(
-                queryset=model.objects.all(),
-                fields=['user', 'capsule'],
-                message="User is already registered in the capsule."
-            )
-        ]
-    state = AdminOnlyField(required=False)
-    
-    def validate_state(self, value):
-        # Validation for illegal action
-        if not self.instance:
-            if value != models.Member.WAITING:
-                raise serializers.ValidationError("Illegal action. Unauthorized.")
-        
-        ## This is kind of useless :)
-        # else:
-        #     print(self.instance.state)
-        #     # New state can't be admin. 
-        #     # New state can't be equal to old state.
-        #     if value == models.Member.ADMIN or value == self.instance.state:
-        #         raise serializers.ValidationError("Illegal action. Unauthorized or duplicated.")
-        
-        return value

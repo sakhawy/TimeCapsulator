@@ -2,12 +2,13 @@ import {useEffect, useState} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
 import { fetchCapsules } from '../store/capsulesSlice'
 import {selectCapsules, selectCapsulesIds, selectCapsulesStatus} from '../store/capsulesSlice'
+import { selectMembers } from '../store/membersSlice'
 
 function CapsuleDetailsModal({name, creationDate, unlockDate, creators, toggleModal}) {
     return (
         <div className="fixed inset-0 flex justify-center items-center bg-primary bg-opacity-70">
             {/* The Modal */}
-            <div className="text-secondary bg-primary w-128 h-128 rounded-2xl p-6 flex flex-col shadow-xl border-seondary border-2"> 
+            <div className="text-secondary bg-primary w-128 h-128 rounded-2xl p-6 flex flex-col shadow-xl border-seondary border-2 m-4"> 
                 {/* Logo */}
                 <div className="flex-grow h-3/12 flex justify-center items-center">
                     <div className="h-full" >
@@ -79,7 +80,7 @@ function Capsule({name, countdown, toggleModal}) {
             <div className="flex flex-col flex-grow w-6/12 cursor-pointer" onClick={toggleModal}>
                 {/* Title */}
                 <div className="flex-grow flex justify-center items-center">
-                    <p  className="text-secondary text-md font-extrabold md:text-2xl">{name}</p>
+                    <p  className="text-secondary text-md font-extrabold md:text-2xl text-center">{name}</p>
                 </div>
                 {/* Countdown */}
                 <div className="flex-grow flex justify-center items-center">
@@ -105,9 +106,14 @@ function Dashboard() {
     const capsulesIds = useSelector(selectCapsulesIds)
     const capsulesStatus = useSelector(selectCapsulesStatus)
 
+    const members = useSelector(selectMembers)
 
     useEffect(() => {
-        dispatch(fetchCapsules())
+        if (!capsulesIds.length){
+            if (capsulesStatus !== "pending"){
+                dispatch(fetchCapsules())
+            }
+        } 
     }, [capsules])
 
     function toggleModal(isActive, id){
@@ -122,9 +128,9 @@ function Dashboard() {
                 <CapsuleDetailsModal 
                     toggleModal={() => toggleModal(!modalIsActive)}
                     name={capsules[modalCapsuleId].name}
-                    creationDate={capsules[modalCapsuleId].creation_date}    
-                    unlockDate={capsules[modalCapsuleId].unlock_date}
-                    creators={capsules[modalCapsuleId].members}    
+                    creationDate={capsules[modalCapsuleId].creationDate}    
+                    unlockDate={capsules[modalCapsuleId].unlockDate}
+                    creators={capsules[modalCapsuleId].members.map(id => members[id].user_name)}    
                 />}
             <div className="bg-secondary min-h-128 rounded-b-2xl p-6 space-y-2">
                 {

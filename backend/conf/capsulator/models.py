@@ -87,7 +87,7 @@ class Capsule(models.Model):
     creation_date = models.DateTimeField(blank=True, null=True)
     locking_date = models.DateTimeField(blank=True, null=True)
     unlocking_date = models.DateTimeField(blank=True, null=True)
-    public = models.BooleanField(False)
+    is_public = models.BooleanField(False)
 
     def save(self, *args, **kwargs):
         if not self.id:

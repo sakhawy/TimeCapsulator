@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react'
-import {Link, useHistory} from "react-router-dom";
+import {Link, useHistory, useLocation} from "react-router-dom";
 import {useSelector} from 'react-redux'
 import classname from 'classnames'
 
@@ -34,11 +34,11 @@ function Navbar({items}) {
   // Needed for choosing wheather we're keeping or ditching the tab 
   const user = useSelector(selectUser)
 
-  const history = useHistory()
+  const location = useLocation()
 
   useEffect(() => {
-    setActiveTab(history.location.pathname)
-  }, [history.location.pathname])
+    setActiveTab(location.pathname)
+  }, [location.pathname])
 
   function changeActiveTab(tab){
     setActiveTab(tab)

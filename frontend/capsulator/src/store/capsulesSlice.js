@@ -4,7 +4,9 @@ import { useSelector } from 'react-redux';
 import { selectUser } from './authSlice';
 import { instance as axios } from '../api/axios'
 import endpoints from '../api/endpoints'
-import {joinCapsule} from './memberSlice'
+import {joinCapsule, setMembers} from './membersSlice'
+import {formatManyCapsules} from '../formatters/capsulesFormatter'
+
 
 export const fetchCapsules = createAsyncThunk(
     'capsules/fetchCapsules',
@@ -21,7 +23,13 @@ export const fetchCapsules = createAsyncThunk(
                 },
             });
             if (response.status === 200){
-                return response.data
+                // Normalized data
+                const {capsules, members} = formatManyCapsules(response.data)
+                
+                // Update the members
+                thunkAPI.dispatch(setMembers(members))
+
+                return capsules
             }
             else
                 return thunkAPI.rejectWithValue(response.data)
@@ -49,7 +57,7 @@ export const createCapsule = createAsyncThunk(
                     name: data.name,
                     unlock_date: data.unlockDate,
                     member: data.member,
-                    public: data.public
+                    is_public: data.public
                 }
             });
             if (response.status === 201){
@@ -69,20 +77,20 @@ const capsuleAdapter = createEntityAdapter({
     selectId: (capsule) => capsule.id
 })
 
-const initialState = {
-    status: 'pending',
-    error: null, 
-    ...capsuleAdapter.getInitialState()
-}
-
 export const capsulesSlice = createSlice({
     name: 'capsules',
-    initialState: initialState,
-    reducer: {
+    initialState: capsuleAdapter.getInitialState({
+        status: 'fulfilled',
+        error: null, 
+    }),
+    reducers: {
         addCapsule: capsuleAdapter.addOne,
         updateCapsule: capsuleAdapter.updateOne,
         setCapsules: capsuleAdapter.setAll,
-        addCapsules: capsuleAdapter.addMany
+        addCapsules: capsuleAdapter.addMany,
+        addCapsuleMember: (state, {payload}) => {
+            state.entities[payload.capsuleId].members.push(payload.memberId)
+        }
     },
     extraReducers: {
         [fetchCapsules.pending]: (state, action) => {
@@ -112,7 +120,8 @@ export const capsulesSlice = createSlice({
 export const selectCapsulesIds = (state) => state.capsules.ids // Not the whole capsules
 export const selectCapsules = (state) => state.capsules.entities // Not the whole capsules
 export const selectCapsulesStatus = (state) => state.capsules.status // Not the whole capsules
+export const selectCapsulesError = (state) => state.capsules.error // Not the whole capsules
 
-export const {addCapsule, updateCapsule, setCapsules} = capsulesSlice.actions
+export const {addCapsule, updateCapsule, setCapsules, addCapsuleMember} = capsulesSlice.actions
 
 export default capsulesSlice.reducer

@@ -4,6 +4,8 @@ import { selectUser } from './authSlice';
 import {instance as axios} from "../api/axios"
 import endpoints from '../api/endpoints'
 import { selectProfile } from './profileSlice';
+import { addCapsuleMember } from './capsulesSlice';
+import {formatManyMembers} from "../formatters/membersFormatter"
 
 export const joinCapsule = createAsyncThunk(
     'member/joinCapsule',
@@ -28,30 +30,34 @@ export const joinCapsule = createAsyncThunk(
                 }
             });
             if (response.status === 201){
+                // TODO: Update the capsule
+                thunkAPI.dispatch(addCapsuleMember({
+                    memberId: response.data.id,
+                    capsuleId: response.data.capsule
+                }))
+                console.log(formatManyMembers(response.data))
                 return response.data
             }
             else
                 return thunkAPI.rejectWithValue(response.data)
         }
         catch (e){
+            console.log(e)
             return thunkAPI.rejectWithValue({data: e.response.data, status: e.response.status})
         }
     }
 )
 
-const memberAdapter = createEntityAdapter({
+export const memberAdapter = createEntityAdapter({
     selectId: (member) => member.id
 })
 
-const initialState = {
-    entities: memberAdapter.getInitialState(),
-    status: 'pending',
-    error: null
-}
-
-export const memberSlice = createSlice({
-    name: 'member',
-    initialState,
+export const membersSlice = createSlice({
+    name: 'members',
+    initialState: memberAdapter.getInitialState({
+        status: 'pending',
+        error: null
+    }),
     reducers: {
         addMember: memberAdapter.addOne,
         updateMember: memberAdapter.updateOne,
@@ -64,22 +70,24 @@ export const memberSlice = createSlice({
         },
         [joinCapsule.fulfilled]: (state, action) => {
             state.status = 'fulfilled'
-            memberAdapter.addOne(state.entities, action.payload)
-            // TODO: Update the capsule
+            memberAdapter.addOne(state, action.payload)
+            
             
         },
         [joinCapsule.rejected]: (state, action) => {
             state.status = 'rejected'
-            // state.error = payload
+
+            state.error = action.payload
         },
     }
 })
 
-export const selectMember = (state) => state.member.entity
-export const selectMemberStatus = (state) => state.member.status
-export const selectMemberError = (state) => state.member.error
+export const selectMembers = (state) => state.members.entities
+export const selectMembersIds = (state) => state.members.ids
+export const selectMembersStatus = (state) => state.members.status
+export const selectMembersError = (state) => state.members.error
 
 
-export const {changeTab} = memberSlice.actions
+export const {addMember, addMembers, setMember, setMembers} = membersSlice.actions
 
-export default memberSlice.reducer;
+export default membersSlice.reducer;
