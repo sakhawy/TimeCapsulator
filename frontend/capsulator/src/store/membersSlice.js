@@ -35,7 +35,6 @@ export const joinCapsule = createAsyncThunk(
                     memberId: response.data.id,
                     capsuleId: response.data.capsule
                 }))
-                console.log(formatManyMembers(response.data))
                 return response.data
             }
             else

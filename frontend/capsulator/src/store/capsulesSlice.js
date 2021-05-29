@@ -5,7 +5,7 @@ import { selectUser } from './authSlice';
 import { instance as axios } from '../api/axios'
 import endpoints from '../api/endpoints'
 import {joinCapsule, setMembers} from './membersSlice'
-import {formatManyCapsules} from '../formatters/capsulesFormatter'
+import {formatManyCapsules, formatOneCapsule} from '../formatters/capsulesFormatter'
 
 
 export const fetchCapsules = createAsyncThunk(
@@ -62,7 +62,8 @@ export const createCapsule = createAsyncThunk(
             });
             if (response.status === 201){
                 thunkAPI.dispatch(joinCapsule({capsuleId: response.data.id, capsuleKey: response.data.key}))
-                return response.data
+                const {capsule, members} = formatOneCapsule(response.data)
+                return capsule
             }
             else
                 return thunkAPI.rejectWithValue(response.data)
@@ -72,6 +73,57 @@ export const createCapsule = createAsyncThunk(
         }
     }
 )
+
+export const submitCapsule = createAsyncThunk(
+    'capsules/submitCapsule',
+    async({
+        memberId,
+        // message,
+        images
+    }, thunkAPI) => {
+        try{
+
+            const user = selectUser(thunkAPI.getState())
+
+            console.log(memberId, images)
+
+            let formData = new FormData()
+
+            // Add multiple images
+            for (var i=0; i<images.length; i++){
+                formData.append('content', images[i])
+            }
+
+            formData.append('member', memberId)
+
+            const response = await axios({
+                url: endpoints.resource,
+                method: 'POST',
+                headers: {
+                    'Authorization': `Token ${user.access_token}`,
+
+                    // Form-data post request for file upload
+                    'Content-Type': 'multipart/form-data'
+                },
+                data: formData,
+                
+            });
+            if (response.status === 200){
+                // thunkAPI.dispatch(joinCapsule({capsuleId: response.data.id, capsuleKey: response.data.key}))
+                // const {capsule, members} = formatOneCapsule(response.data)
+                // return capsule
+                console.log(response.data)
+            }
+            // else
+                // return thunkAPI.rejectWithValue(response.data)
+        }
+        catch (e){
+            console.log(e)
+            // return thunkAPI.rejectWithValue({data: e.response.data, status: e.response.status})
+            }
+        }
+)
+
 
 const capsuleAdapter = createEntityAdapter({
     selectId: (capsule) => capsule.id

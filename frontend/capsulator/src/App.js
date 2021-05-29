@@ -12,6 +12,7 @@ import Dashboard from './components/DashboardPage';
 import Logout from './components/Logout';
 import Create from './components/Create';
 import { fetchProfile } from './store/profileSlice';
+import EditCapsule from './components/EditCapsule';
 
 function App() {
 
@@ -20,7 +21,8 @@ function App() {
     AuthPage: "/auth",
     Dashboard: "/dashboard",
     Create: "/create",
-    Logout: "/logout"
+    Edit: "/edit",
+    Logout: "/logout",
   }
 
   const dispatch = useDispatch()
@@ -107,6 +109,7 @@ function App() {
                 <ProtectedRoute path={`${routes.Dashboard}`} component={Dashboard} redirection={`${routes.LandingPage}`}/>
                 <ProtectedRoute path={`${routes.Logout}`} component={Logout} redirection={`${routes.AuthPage}`}/>
                 <ProtectedRoute path={`${routes.Create}`} component={Create} redirection={`${routes.AuthPage}`}/>
+                <ProtectedRoute path={`${routes.Edit}/:id`} component={EditCapsule} redirection={`${routes.AuthPage}`}/>
               </Switch>
           </div>
         </div>

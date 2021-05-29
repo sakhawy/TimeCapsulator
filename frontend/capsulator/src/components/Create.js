@@ -7,12 +7,12 @@ import { fetchProfile, selectProfile } from "../store/profileSlice"
 import { useHistory } from "react-router"
 
 
-function CreationVerificationModal({capsuleURL}) {
+function CreationVerificationModal({capsuleURL, capsuleMember}) {
     const [copied, setCopied] = useState("Copy")
     const history = useHistory()
 
     function handleRedirect(){
-        history.push("/dashboard")
+        history.push(`/edit/${capsuleMember}`)
     }
 
     return (
@@ -65,7 +65,7 @@ function Create() {
     
     const [created, setCreated] = useState(0)
     
-    const [modalCapsuleURL, setModalCapsuleURL] = useState(null)
+    const [modalCapsule, setModalCapsule] = useState(null)
     const [modalIsReady, setModalIsReady] = useState(false)
 
     const capsules = useSelector(selectCapsules)
@@ -78,18 +78,24 @@ function Create() {
         () => {
             if (capsulesStatus !== 'pending' && created){
                 // The created capsule is the last one in the ids list 
-                const capsuleURL = `http://localhost:8000/${capsules[capsulesIds[capsulesIds.length - 1]].key}`;
-                setModalCapsuleURL(capsuleURL)
+                const createdCapsule = capsules[capsulesIds[capsulesIds.length - 1]] 
+                
+                // When the admin member successfully joins the created capsule
+                if (createdCapsule.members.length){
+                    const capsuleURL = `http://localhost:8000/${createdCapsule.key}`;
+                    setModalCapsule({capsuleURL: capsuleURL, capsuleMember: createdCapsule.members[0]})
+                }
+
             }
         }, [capsules])
 
     useEffect(() => {
         // Render the modal
-        if (modalCapsuleURL){
+        if (modalCapsule){
             setModalIsReady(1)
         }
 
-    }, [modalCapsuleURL])
+    }, [modalCapsule])
 
     const profile = useSelector(selectProfile)
 
@@ -104,7 +110,7 @@ function Create() {
 
     return (
         <div>
-            { modalIsReady && <CreationVerificationModal capsuleURL={modalCapsuleURL} /> }
+            { modalIsReady && <CreationVerificationModal capsuleURL={modalCapsule.capsuleURL} capsuleMember={modalCapsule.capsuleMember}/> }
             <div className="bg-secondary h-128 rounded-b-2xl p-4 ">
                 <div className="flex flex-col space-y-2">
                     {/* Create Capsule */}

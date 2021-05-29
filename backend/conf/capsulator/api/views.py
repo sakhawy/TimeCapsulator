@@ -69,7 +69,6 @@ class UserDetail(APIView):
 class ResourceList(APIView):
     ### ADD META
     def post(self, request, format=None):
-        
         try:
             member = models.Member.objects.get(id=request.data.get('member', None))
         except models.Member.DoesNotExist:

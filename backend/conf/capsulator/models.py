@@ -90,12 +90,9 @@ class Capsule(models.Model):
     is_public = models.BooleanField(False)
 
     def save(self, *args, **kwargs):
-        if not self.id:
+        # if not self.id:
             # Update DateTimeFields
             # self.creation_date = timezone.now()
-
-            # Create random key
-            self.key = "".join(random.choice(ascii_letters + digits) for i in range(Capsule.KEY_LENGTH))
 
         # TODO: Clean this up if possible
         # Set DateTimeFields (ugly)
@@ -122,6 +119,14 @@ class Capsule(models.Model):
     
     def __repr__(self):
         return self.name
+
+@receiver(post_save, sender=Capsule)
+def create_random_key(sender, instance, created, **kwargs):
+    # Create a random key for every new capsule
+    if created:
+        # The id in the end is to make sure it's unique :)
+        instance.key = "".join(random.choice(ascii_letters + digits) for i in range(Capsule.KEY_LENGTH)) + str(instance.id)
+        instance.save()
 
 class Member(models.Model):
     class Meta:
@@ -157,10 +162,10 @@ class Member(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.user.username
+        return f"{self.user.username} #{self.id}"
 
     def __repr__(self):
-        return self.user.username
+        return f"{self.user.username} #{self.id}"
 
 @receiver(post_save, sender=Member)
 def handle_membership(sender, instance, created, **kwargs):
@@ -183,10 +188,10 @@ class Resource(models.Model):
     member = models.OneToOneField(Member, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.member
+        return f"{self.member}"
 
     def __repr__(self):
-        return self.member
+        return f"{self.member}"
 
 class File(models.Model):
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE, related_name="images")
