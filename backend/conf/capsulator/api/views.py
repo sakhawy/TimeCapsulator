@@ -126,7 +126,7 @@ class CapsuleList(APIView):
     def get(self, request, format=None):
         """Get users's capsules"""
         # NOTE: change this if you're going to use it to retrieve public capsules
-        member_capsules = [x.capsule for x in models.Member.objects.filter(user=request.user)] 
+        member_capsules = [x.capsule for x in models.Member.objects.filter(user=request.user, state__in=[models.Member.MEMBER, models.Member.ADMIN])] 
         capsule_serializer = serializers.CapsuleSerializer(member_capsules, many=True)
         return Response(capsule_serializer.data, status=status.HTTP_200_OK)
 
@@ -178,7 +178,7 @@ class MemberList(APIView):
         # The reason it's ID & KEY is for handling duplication (the l/eazy way) (hate this word too)
         # NOTE: The ideal way is to handle this in the serializers but I don't know how.
         try:
-            capsule = models.Capsule.objects.get(id=request.data.get("capsule", None), key=request.data.get("key", None))
+            capsule = models.Capsule.objects.get(key=request.data.get("key", None))
 
         except models.Capsule.DoesNotExist:
             raise Http404("Capsule doesn't exist.")
@@ -188,6 +188,9 @@ class MemberList(APIView):
 
         # Creation must be restricted to the current user
         member_data["user"] = request.user.id
+
+        # Manually add it since we get the capsule by key now.
+        member_data["capsule"] = capsule.id
 
         member_serializer = serializers.MemberSerializer(
             data=member_data,

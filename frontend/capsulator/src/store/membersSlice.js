@@ -9,7 +9,7 @@ import {formatManyMembers} from "../formatters/membersFormatter"
 
 export const joinCapsule = createAsyncThunk(
     'member/joinCapsule',
-    async ({capsuleId, capsuleKey }, thunkAPI) => {
+    async ({capsuleKey}, thunkAPI) => {
         try{
 
             const user = selectUser(thunkAPI.getState())
@@ -23,25 +23,26 @@ export const joinCapsule = createAsyncThunk(
                 },
                 data: {
                     user: profile.id,
-                    capsule: capsuleId,
                     key: capsuleKey,
-
-
                 }
             });
             if (response.status === 201){
                 // TODO: Update the capsule
-                thunkAPI.dispatch(addCapsuleMember({
-                    memberId: response.data.id,
-                    capsuleId: response.data.capsule
-                }))
+                
+                // If it's a member or an admin (meaning the capsule is already created)
+                if (response.data.state === "M" || response.data.state === "A"){
+                    thunkAPI.dispatch(addCapsuleMember({
+                        memberId: response.data.id,
+                        capsuleId: response.data.capsule
+                    }))
+                }
+
                 return response.data
             }
             else
                 return thunkAPI.rejectWithValue(response.data)
         }
         catch (e){
-            console.log(e)
             return thunkAPI.rejectWithValue({data: e.response.data, status: e.response.status})
         }
     }

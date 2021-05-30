@@ -14,6 +14,7 @@ import Create from './components/Create';
 import EditCapsule from './components/EditCapsule';
 import { fetchProfile } from './store/profileSlice';
 import { fetchCapsules, selectCapsules, selectCapsulesIds, selectCapsulesStatus } from './store/capsulesSlice'
+import JoinCapsule from './components/JoinCapsule';
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
     Dashboard: "/dashboard",
     Create: "/create",
     Edit: "/edit",
+    Join: "/join",
     Logout: "/logout",
   }
 
@@ -105,6 +107,12 @@ function App() {
                   },
                   {
                     image: "./logo.png",
+                    title: "Join",
+                    link: routes.Join,
+                    authState: 1
+                  },
+                  {
+                    image: "./logo.png",
                     title: "Logout",
                     link: routes.Logout,
                     authState: 1
@@ -125,6 +133,7 @@ function App() {
                 <ProtectedRoute path={`${routes.Logout}`} component={Logout} redirection={`${routes.AuthPage}`}/>
                 <ProtectedRoute path={`${routes.Create}`} component={Create} redirection={`${routes.AuthPage}`}/>
                 <ProtectedRoute path={`${routes.Edit}/:id`} component={EditCapsule} redirection={`${routes.AuthPage}`}/>
+                <ProtectedRoute path={`${routes.Join}`} component={JoinCapsule} redirection={`${routes.AuthPage}`}/>
               </Switch>
           </div>
         </div>

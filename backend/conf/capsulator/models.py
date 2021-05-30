@@ -125,7 +125,7 @@ def create_random_key(sender, instance, created, **kwargs):
     # Create a random key for every new capsule
     if created:
         # The id in the end is to make sure it's unique :)
-        instance.key = "".join(random.choice(ascii_letters + digits) for i in range(Capsule.KEY_LENGTH)) + str(instance.id)
+        instance.key = "".join(random.choice(ascii_letters + digits) for i in range(Capsule.KEY_LENGTH - len(str(instance.id)))) + str(instance.id)
         instance.save()
 
 class Member(models.Model):

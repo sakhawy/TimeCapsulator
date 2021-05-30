@@ -92,7 +92,6 @@ function EditCapsule() {
 
         const memberResource = resourcesIds.filter(resource => resources[resource].member === parseInt(id))
         if (!memberResource.length){
-            console.log(memberResource, id, resources)
             dispatch(fetchResource({memberId: id}))
         } else {
             // We have the resource; render its content
@@ -104,7 +103,12 @@ function EditCapsule() {
     function handleSubmit(){
         if (message && images){
             setEmptySubmission(0)
-            dispatch(uploadResource({memberId:id, images:images}))
+
+            // POST request when no existing resource
+            const memberResource = resourcesIds.filter(resource => resources[resource].member === parseInt(id))
+            if (!memberResource.length){
+                dispatch(uploadResource({memberId:id, images:images}))
+            }
         } else {
             setEmptySubmission(1)
         }
