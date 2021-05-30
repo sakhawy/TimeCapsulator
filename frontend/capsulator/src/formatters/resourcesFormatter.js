@@ -3,11 +3,13 @@ export const formatOneResource = ({
     // Normalizing a single resource
         id,
         member,
+        message,
         images 
     }) => {
     return {
         id,
         member,
+        message,
         images: images.map(image => `http://127.0.0.1:8000${image.content}`)           
     }
 }

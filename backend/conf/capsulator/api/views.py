@@ -99,7 +99,7 @@ class ResourceList(APIView):
         # Update the serializer with the new images
         resource_serializer = serializers.ResourceSerializer(resource)
 
-        return Response(resource_serializer.data, status=status.HTTP_200_OK)
+        return Response(resource_serializer.data, status=status.HTTP_201_CREATED)
 
 class ResourceDetail(APIView):
     def get(self, request, id, format=None):
@@ -119,6 +119,37 @@ class ResourceDetail(APIView):
         resource_serializer = serializers.ResourceSerializer(resource)
         
         return Response(resource_serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, id, format=None):
+        try:
+            # Only the user's members
+            member = models.Member.objects.filter(user=request.user.id).get(id=id)
+            resource = models.Resource.objects.get(member=member)
+
+        except models.Member.DoesNotExist:
+            raise PermissionDenied
+        
+        except models.Resource.DoesNotExist:
+            raise Http404
+
+        for content in request.FILES.getlist('content'):
+            file_serializer = serializers.FileSerializer(data={
+                "resource": resource.id,
+                "content": content     
+            })
+            if file_serializer.is_valid():
+                file_serializer.save()
+
+            else:
+                return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        resource_serializer = serializers.ResourceSerializer(resource, data=request.data)
+        if resource_serializer.is_valid():
+            resource_serializer.save()
+            return Response(resource_serializer.data, status=status.HTTP_200_OK)
+
+        return Response(resource_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class CapsuleList(APIView):
     permission_classes = [permissions.IsAuthenticated]

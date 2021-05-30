@@ -186,6 +186,7 @@ def handle_membership(sender, instance, created, **kwargs):
 
 class Resource(models.Model):
     member = models.OneToOneField(Member, on_delete=models.CASCADE)
+    message = models.CharField(max_length=10000)
 
     def __str__(self):
         return f"{self.member}"

@@ -147,4 +147,4 @@ class ResourceSerializer(serializers.ModelSerializer):
     images = FileSerializer(many=True, read_only=True)
     class Meta:
         model = models.Resource
-        fields = ["id", "member", "images"]
+        fields = ["id", "member", "message", "images"]

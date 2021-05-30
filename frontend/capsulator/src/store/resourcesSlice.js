@@ -14,7 +14,7 @@ export const fetchResource = createAsyncThunk(
             const user = selectUser(thunkAPI.getState())
 
             const response = await axios({
-                url: `${endpoints.resource}${memberId}`,
+                url: `${endpoints.resource}${memberId}/`,
                 method: 'GET',
                 headers: {
                     'Authorization': `Token ${user.access_token}`,
@@ -39,7 +39,7 @@ export const uploadResource = createAsyncThunk(
     'resources/uploadResource',
     async({
         memberId,
-        // message,
+        message,
         images
     }, thunkAPI) => {
         try{
@@ -54,10 +54,57 @@ export const uploadResource = createAsyncThunk(
             }
 
             formData.append('member', memberId)
+            formData.append('message', message)
 
             const response = await axios({
                 url: endpoints.resource,
                 method: 'POST',
+                headers: {
+                    'Authorization': `Token ${user.access_token}`,
+
+                    // Form-data post request for file upload
+                    'Content-Type': 'multipart/form-data'
+                },
+                data: formData,
+                
+            });
+            if (response.status === 201){
+                const {resources} = formatManyResources([response.data])
+                return resources[0]
+            }
+            else{
+                return thunkAPI.rejectWithValue(response.data)
+            }
+        }
+        catch (e){
+            return thunkAPI.rejectWithValue({data: e.response.data, status: e.response.status})
+            }
+        }
+)
+
+export const updateResource = createAsyncThunk(
+    'resources/updateResource',
+    async({
+        memberId,
+        message,
+        images
+    }, thunkAPI) => {
+        try{
+            const user = selectUser(thunkAPI.getState())
+
+            let formData = new FormData()
+
+            // Add multiple images
+            for (var i=0; i<images.length; i++){
+                formData.append('content', images[i])
+            }
+
+            formData.append('member', memberId)
+            formData.append('message', message)
+
+            const response = await axios({
+                url: `${endpoints.resource}${memberId}/`,
+                method: 'PUT',
                 headers: {
                     'Authorization': `Token ${user.access_token}`,
 
@@ -81,7 +128,6 @@ export const uploadResource = createAsyncThunk(
         }
 )
 
-
 export const resourceAdapter = createEntityAdapter({
     selectId: (resource) => resource.id
 })
@@ -94,7 +140,7 @@ export const resourcesSlice = createSlice({
     }),
     reducers: {
         addResource: resourceAdapter.addOne,
-        updateResource: resourceAdapter.updateOne,
+        updateResource: resourceAdapter.upsertOne,
         setResources: resourceAdapter.setAll,
         addResources: resourceAdapter.addMany
     },
@@ -105,10 +151,20 @@ export const resourcesSlice = createSlice({
         [uploadResource.fulfilled]: (state, action) => {
             state.status = 'fulfilled'
             resourceAdapter.addOne(state, action.payload)
-            
-            
         },
         [uploadResource.rejected]: (state, action) => {
+            state.status = 'rejected'
+
+            state.error = action.payload
+        },
+        [updateResource.pending]: (state) => {
+            state.status = 'pending'
+        },
+        [updateResource.fulfilled]: (state, action) => {
+            state.status = 'fulfilled'
+            resourceAdapter.upsertOne(state, action.payload)
+        },
+        [updateResource.rejected]: (state, action) => {
             state.status = 'rejected'
 
             state.error = action.payload

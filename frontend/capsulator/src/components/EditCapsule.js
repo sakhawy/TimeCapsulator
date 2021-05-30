@@ -4,7 +4,7 @@ import { useParams, useHistory, useLocation, useRouteMatch } from "react-router"
 import classname from 'classnames'
 
 import { selectCapsules, selectCapsulesStatus } from "../store/capsulesSlice"
-import { fetchResource, selectResources, selectResourcesIds, selectResourcesStatus, uploadResource } from "../store/resourcesSlice"
+import { fetchResource, selectResources, selectResourcesIds, selectResourcesStatus, updateResource, uploadResource } from "../store/resourcesSlice"
 import { selectMembers, selectMembersIds, selectMembersStatus } from "../store/membersSlice"
 import { selectProfile } from "../store/profileSlice"
 
@@ -22,7 +22,6 @@ function  ImageModal({images, image, toggleModal}){
 
     function handleChangeImage(amount){
         if ( 0 <= currentImage + amount && currentImage + amount < images.length ){
-            console.log(currentImage + amount)
             setCurrentImage(currentImage + amount)
         } 
 
@@ -60,8 +59,8 @@ function  ImageModal({images, image, toggleModal}){
 function EditCapsule() {
 
     const [message, setMessage] = useState("")
-    const [imagesURLs, setImagesURLs] = useState([])
-    const [images, setImages] = useState([])
+    const [imagesURLs, setImagesURLs] = useState([])    // Images from the server (or client) to be displayed
+    const [images, setImages] = useState([])    // Images to be actually uploaded
     const [emptySubmission, setEmptySubmission] = useState(0)
     
     const [notFound, setNotFound] = useState(0)
@@ -87,14 +86,17 @@ function EditCapsule() {
     const resourcesIds = useSelector(selectResourcesIds)
     const resourcesStatus = useSelector(selectResourcesStatus)
 
+    const memberResource = resourcesIds.filter(resource => resources[resource].member === parseInt(id))
+
     useEffect(() => {
         // Fetch resource if we don't have it
 
-        const memberResource = resourcesIds.filter(resource => resources[resource].member === parseInt(id))
+        
         if (!memberResource.length){
             dispatch(fetchResource({memberId: id}))
         } else {
             // We have the resource; render its content
+            setMessage(resources[memberResource[0]].message)
             setImagesURLs(resources[memberResource[0]].images)
         }
 
@@ -105,10 +107,13 @@ function EditCapsule() {
             setEmptySubmission(0)
 
             // POST request when no existing resource
-            const memberResource = resourcesIds.filter(resource => resources[resource].member === parseInt(id))
-            if (!memberResource.length){
-                dispatch(uploadResource({memberId:id, images:images}))
+            const resourceExists = !(memberResource.length === 0)
+            if (!resourceExists){
+                dispatch(uploadResource({memberId:id, message: message, images:images}))
+            } else {
+                dispatch(updateResource({memberId:id, message: message, images:images}))
             }
+
         } else {
             setEmptySubmission(1)
         }
@@ -120,7 +125,7 @@ function EditCapsule() {
             setImages(e.target.files)
 
             const files = Array.from(e.target.files).map(file => URL.createObjectURL(file)) 
-            setImagesURLs(files)
+            setImagesURLs(files.concat(resources[memberResource].images))
     
             // Prevent leaks
             Array.from(e.target.files).map(file => URL.revokeObjectURL(file))
@@ -130,23 +135,6 @@ function EditCapsule() {
     function handleToggleModal(){
         setToggleModal(0)
     }
-
-    // if (notFound){
-    //     return (
-    //         <div>
-    //             Not found!
-    //         </div>
-    //     )
-    // }
-
-    // if (capsulesStatus === 'pending'){
-    //     console.log("PENDING....")
-    //     return (
-    //         <div>
-    //             Loading...
-    //         </div>
-    //     )
-    // }
 
     return (
         <div className="bg-secondary relative overflow-hidden rounded-2xl">
@@ -170,6 +158,7 @@ function EditCapsule() {
                             <textarea 
                                 className="resize-none bg-primary text-secondary w-full h-full rounded-2xl outline-none"
                                 onChange={(e) => {setMessage(e.target.value)}}
+                                value={message}
                             ></textarea>
 
                         </div>
@@ -202,7 +191,7 @@ function EditCapsule() {
                             <div className="flex flex-grow flex-wrap justify-center items-center w-full h-5/6 ">
                                 {imagesURLs && imagesURLs.map(image => {return (
                                     <div 
-                                        className="flex md:h-44 md:w-44 w-24 h-24 bg-secondary m-1 p-1 rounded-xl" 
+                                        className="flex md:h-44 md:w-44 w-24 h-24 bg-secondary m-1 p-1 rounded-xl cursor-pointer" 
                                         key={imagesURLs.indexOf(image)}
                                         onClick={() => { setToggleModal(1); setModalImage(imagesURLs.indexOf(image))}}    
                                     >
