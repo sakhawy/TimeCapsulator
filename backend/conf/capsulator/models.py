@@ -68,7 +68,7 @@ def create_auth_token(sender, instance, created, **kwargs):
         Token.objects.create(user=instance)
 
 class Capsule(models.Model):
-    KEY_LENGTH = 12
+    KEY_LENGTH = 20
 
     CREATED = 0
     LOCKED = 1

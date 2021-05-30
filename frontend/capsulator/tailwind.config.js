@@ -4,6 +4,10 @@ module.exports = {
   theme: {
     
     extend:{
+      outline: {
+        primary: ['2px dashed #545454', '1px'],
+        secondary: ['2px dashed #bdbdbd', '1px'],
+      },
       spacing: {
         '128': "32rem",
         '1/12': "8.33%",

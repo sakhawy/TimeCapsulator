@@ -165,7 +165,18 @@ export const capsulesSlice = createSlice({
         [createCapsule.rejected]: (state, action) => {
             state.status = "rejected"
             state.error = action.payload
-        }
+        },
+        [submitCapsule.pending]: (state, action) => {
+            state.status = 'pending'
+        },
+        [submitCapsule.fulfilled]: (state, action) => {
+            state.status = 'fulfilled'
+            // capsuleAdapter.addOne(state, action.payload)
+        },
+        [submitCapsule.rejected]: (state, action) => {
+            state.status = "rejected"
+            state.error = action.payload
+        },
     }
 }) 
 

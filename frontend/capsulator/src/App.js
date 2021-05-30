@@ -11,8 +11,9 @@ import {authenticate, selectUser, setToken, selectAuthStatus, loadToken} from '.
 import Dashboard from './components/DashboardPage';
 import Logout from './components/Logout';
 import Create from './components/Create';
-import { fetchProfile } from './store/profileSlice';
 import EditCapsule from './components/EditCapsule';
+import { fetchProfile } from './store/profileSlice';
+import { fetchCapsules, selectCapsules, selectCapsulesIds, selectCapsulesStatus } from './store/capsulesSlice'
 
 function App() {
 
@@ -38,6 +39,20 @@ function App() {
       dispatch(fetchProfile())
     }
   }, [user.access_token])
+
+  const capsules = useSelector(selectCapsules)
+  const capsulesIds = useSelector(selectCapsulesIds)
+  const capsulesStatus = useSelector(selectCapsulesStatus)
+
+  useEffect(() => {
+    // Fetching capsules is global right now...
+
+    if (!capsulesIds.length && user.access_token){
+        if (capsulesStatus !== "pending"){
+            dispatch(fetchCapsules())
+        }
+    } 
+  }, [capsules, user.access_token])
   
   // Waiting for token to be fetched
   // Without this we'll be constantly redirected in ProtectedRoute

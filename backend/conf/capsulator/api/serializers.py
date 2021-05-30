@@ -138,13 +138,13 @@ class CapsuleSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Cannot lock the capusle while some members aren're ready.")
         return value
         
-class ResourceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Resource
-        fields = ["id", "member"]
-    
 class FileSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.File
         fields = ["id", "resource", "content"]
     
+class ResourceSerializer(serializers.ModelSerializer):
+    images = FileSerializer(many=True, read_only=True)
+    class Meta:
+        model = models.Resource
+        fields = ["id", "member", "images"]

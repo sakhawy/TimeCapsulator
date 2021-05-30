@@ -8,6 +8,7 @@ from rest_framework import exceptions
 from rest_framework.authtoken.models import Token
 
 from django.http import Http404
+from django.core.exceptions import PermissionDenied
 from django.conf import settings
 
 # Google auth
@@ -67,16 +68,21 @@ class UserDetail(APIView):
         return Response(user_serializer.data, status=status.HTTP_200_OK)
 
 class ResourceList(APIView):
+    permission_classes = [permissions.IsAuthenticated]
     ### ADD META
     def post(self, request, format=None):
+        "Creates a resource with its image files for the requesting user."
+
         try:
-            member = models.Member.objects.get(id=request.data.get('member', None))
+            # Only the user's members
+            member = models.Member.objects.filter(user=request.user.id).get(id=request.data.get('member', None))
+            
         except models.Member.DoesNotExist:
             raise Http404
 
         resource_serializer = serializers.ResourceSerializer(data=request.data)
         if resource_serializer.is_valid():
-            resource_serializer.save()
+            resource = resource_serializer.save()
             for content in request.FILES.getlist('content'):
                 file_serializer = serializers.FileSerializer(data={
                     "resource": resource_serializer.data['id'],
@@ -89,6 +95,28 @@ class ResourceList(APIView):
                     return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(resource_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Update the serializer with the new images
+        resource_serializer = serializers.ResourceSerializer(resource)
+
+        return Response(resource_serializer.data, status=status.HTTP_200_OK)
+
+class ResourceDetail(APIView):
+    def get(self, request, id, format=None):
+        "Gets a resource with its image files for the requesting user."
+        
+        try:
+            # Only the user's members
+            member = models.Member.objects.filter(user=request.user.id).get(id=id)
+            resource = models.Resource.objects.get(member=member)
+
+        except models.Member.DoesNotExist:
+            raise PermissionDenied
+        
+        except models.Resource.DoesNotExist:
+            raise Http404
+        
+        resource_serializer = serializers.ResourceSerializer(resource)
         
         return Response(resource_serializer.data, status=status.HTTP_200_OK)
 

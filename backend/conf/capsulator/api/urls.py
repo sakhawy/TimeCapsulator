@@ -12,4 +12,5 @@ urlpatterns = [
     path('member/', views.MemberList.as_view()),
     path('member/<int:id>/', views.MemberDetail.as_view()),
     path('resource/', views.ResourceList.as_view()),
+    path('resource/<int:id>/', views.ResourceDetail.as_view()),
 ]
