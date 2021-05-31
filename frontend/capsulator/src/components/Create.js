@@ -61,7 +61,7 @@ function Create() {
     const [shareButton, setShareButton] = useState(0)
     const [publicButton, setPublicButton] = useState(0)
     const [name, setName] = useState("")
-    const [unlockDate, setUnlockDate] = useState("")
+    const [unlockingDate, setUnlockingDate] = useState("")
     
     const [created, setCreated] = useState(0)
     
@@ -102,8 +102,8 @@ function Create() {
     const dispatch = useDispatch()
 
     function handleCreateCapsule(){
-        if (name && unlockDate && profile){
-            dispatch(createCapsule({name: name, unlockDate: unlockDate, member: profile.id, public: publicButton}))
+        if (name && unlockingDate && profile){
+            dispatch(createCapsule({name: name, unlockingDate: unlockingDate, member: profile.id, public: publicButton}))
             setCreated(1)
         }   
     }
@@ -136,7 +136,7 @@ function Create() {
                         <input 
                             className="bg-primary text-secondary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-4/6 h-full rounded-r-2xl" 
                             type="date"
-                            onChange={(e) => {setUnlockDate(e.target.value)}}
+                            onChange={(e) => {setUnlockingDate(e.target.value)}}
                             />
                     </div>
                     {/* Choose share & make public */}

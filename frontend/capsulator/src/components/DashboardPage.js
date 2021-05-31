@@ -110,6 +110,7 @@ function Dashboard() {
 
     const [modalIsActive, setModalIsActive] = useState(false)
     const [modalCapsuleId, setModalCapsuleId] = useState(null)
+    const [time, setTime] = useState(0)
 
     const dispatch = useDispatch()
     
@@ -154,6 +155,32 @@ function Dashboard() {
         }
     }
 
+    function calculateTime(){
+        var timerObject = {}
+        for (var i=0; i<capsulesIds.length; i++){
+            const unlockingDate = +Date.parse(capsules[capsulesIds[i]].unlockingDate)
+            const delta = unlockingDate - +Date.now()
+            
+            const formatted = {
+                days: Math.floor(delta / (1000 * 60 * 60 * 24)).toString().padStart(2, "0"),
+                hours: Math.floor((delta / (1000 * 60 * 60)) % 24).toString().padStart(2, "0"),
+                minutes: Math.floor((delta / 1000 / 60) % 60).toString().padStart(2, "0"),
+                seconds: Math.floor((delta / 1000) % 60).toString().padStart(2, "0")
+            };
+            
+            timerObject[capsulesIds[i]] = `${formatted.days}D ${formatted.hours}:${formatted.minutes}:${formatted.seconds}`
+        }
+        return timerObject
+    }
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setTime(calculateTime());
+          }, 1000);
+        
+        return () => clearTimeout(timer);
+    }, [time])
+
     return (
         // dummy div for modal
         <div> 
@@ -180,7 +207,7 @@ function Dashboard() {
                                     capsule={capsules[capsule]} 
                                     handleLock={handleLock}
                                     handleUnlock={handleUnlock}
-                                    countdown={"zby"} toggleModal={() => toggleModal(!modalIsActive, capsules[capsule].id)
+                                    countdown={time[capsule]} toggleModal={() => toggleModal(!modalIsActive, capsules[capsule].id)
                                 }/>
                         )})
                 }
