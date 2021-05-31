@@ -3,9 +3,9 @@ import { useDispatch, useSelector } from "react-redux"
 import { useParams, useHistory, useLocation, useRouteMatch } from "react-router"
 import classname from 'classnames'
 
-import { selectCapsules, selectCapsulesIds, selectCapsulesStatus } from "../store/capsulesSlice"
+import { lockCapsule, selectCapsules, selectCapsulesIds, selectCapsulesStatus } from "../store/capsulesSlice"
 import { fetchCapsuleResources, fetchResource, fetchResources, selectResources, selectResourcesIds, selectResourcesStatus, updateResource, uploadResource } from "../store/resourcesSlice"
-import { selectMembers, selectMembersIds, selectMembersStatus, fetchCapsuleMembers, updateMemberState } from "../store/membersSlice"
+import { selectMembers, selectMembersIds, selectMembersStatus, fetchCapsuleMembers, updateMemberState, updateMemberStatus } from "../store/membersSlice"
 import { selectProfile } from "../store/profileSlice"
 
 
@@ -152,7 +152,7 @@ function OtherMembers(props){
                             Message
                         </p>
                         <p className="text-sm md:text-xl italic">
-                            BODYYYYYYYYYYYYy
+                            {props.resource.message}
                         </p>
                     </div>
                 </div>
@@ -231,6 +231,7 @@ function EditCapsule() {
     const resources = useSelector(selectResources)
     const resourcesIds = useSelector(selectResourcesIds)
     const resourcesStatus = useSelector(selectResourcesStatus)
+    const profile = useSelector(selectProfile)
     
     
     const memberCapsule = capsulesIds.filter(capsule => capsules[capsule].members.includes(parseInt(id)))
@@ -240,7 +241,9 @@ function EditCapsule() {
     useEffect(() => {
         // Validate the memeber in the dynamic url
         if (!membersIds.includes(parseInt(id))){
-            setNotFound(1)
+            if (membersIds.length > 0){
+                setNotFound(1)
+            }    
         }
         else {
             // Set isAdmin state
@@ -313,6 +316,25 @@ function EditCapsule() {
         dispatch(updateMemberState({memberId: requestingMemberId, state: isApproved ? "M" : "B"}))
     }
 
+    function handleReady(){
+        const newStatus = members[id].status === "R" ? "N" : "R" 
+        dispatch(updateMemberStatus({memberId: id, status: newStatus}))
+    }
+
+    function handleLock(){
+        dispatch(lockCapsule({capsuleKey: capsules[memberCapsule[0]].key}))
+    }
+
+    if (notFound === 1){
+        return (
+            <div className="flex flex-col items-center justify-center bg-secondary">
+                <p className="flex-grow text-primary">
+                    Capsule is not found.
+                </p>
+            </div>
+        )
+    }
+
     return (
         <div className="bg-secondary relative overflow-hidden rounded-2xl">
             {toggleModal === 1 && <ImageModal images={imagesURLs} image={modalImage} toggleModal={handleToggleModal}/>}
@@ -381,17 +403,27 @@ function EditCapsule() {
                     <div className="flex flex-grow h-16 w-full items-center justify-center">
                         <div className="flex flex-row flex-grow justify-center items-center w-full h-full space-x-2">
                             <button 
-                                className="h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-2xl"
+                                className="h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-2xl w-3/6"
                                 onClick={() => handleSubmit()}
                             >
                                 Submit
                             </button>
                             
                             <button 
-                                className="h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-2xl"
+                                className="h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-2xl w-3/6"
+                                onClick={handleReady}
                             >
-                                Lock
+                                {members[id] && members[id].status === "R" ? "Not-Ready" : "Ready"}
                             </button>
+
+                            {isAdmin && 
+                                <button 
+                                    className="h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-2xl w-3/6"
+                                    onClick={handleLock}
+                                >
+                                    Lock
+                                </button>
+                            }
                             
                         </div>
                     </div>
@@ -408,7 +440,7 @@ function EditCapsule() {
                 }
                 {/* Other Members */}
                 <Accordion name="Other Members">
-                    {capsuleMembers.length > 0 && capsuleResources.length > 0 && <OtherMembers members={capsuleMembers.map(member => members[member]).filter(member => member.state === 'M')} resources={capsuleResources.map(resource => resources[resource])}/>}
+                    {capsuleMembers.length > 0 && capsuleResources.length > 0 && <OtherMembers members={capsuleMembers.map(member => members[member]).filter(member => member.userId !== profile.id)} resources={capsuleResources.map(resource => resources[resource])}/>}
                 </Accordion>
             </div>
         </div>

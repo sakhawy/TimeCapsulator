@@ -82,6 +82,10 @@ class ResourceList(APIView):
         except IndexError:
             raise PermissionDenied
 
+        # View if available
+        if capsule.state != models.Capsule.CREATED:
+            raise PermissionDenied
+
         capsule_resources = models.Resource.objects.filter(member__in=capsule.members.all())
         capsule_resources_serializer = serializers.ResourceSerializer(capsule_resources, many=True)
         return Response(capsule_resources_serializer.data, status=status.HTTP_200_OK)
@@ -98,6 +102,10 @@ class ResourceList(APIView):
             
         except models.Member.DoesNotExist:
             raise Http404
+
+        # Create if available
+        if member.capsule.state != models.Capsule.CREATED:
+            raise PermissionDenied
 
         resource_serializer = serializers.ResourceSerializer(data=request.data)
         if resource_serializer.is_valid():
@@ -135,6 +143,10 @@ class ResourceDetail(APIView):
         except models.Resource.DoesNotExist:
             raise Http404
         
+        # View if available
+        if member.capsule.state != models.Capsule.CREATED:
+            raise PermissionDenied
+
         resource_serializer = serializers.ResourceSerializer(resource)
         
         return Response(resource_serializer.data, status=status.HTTP_200_OK)
@@ -150,6 +162,10 @@ class ResourceDetail(APIView):
         
         except models.Resource.DoesNotExist:
             raise Http404
+
+        # Edit if available
+        if member.capsule.state != models.Capsule.CREATED:
+            raise PermissionDenied
 
         for content in request.FILES.getlist('content'):
             file_serializer = serializers.FileSerializer(data={
@@ -212,6 +228,10 @@ class CapsuleDetail(APIView):
 
         except models.Capsule.DoesNotExist:
             raise Http404
+
+        # Edit if available
+        if capsule.state != models.Capsule.CREATED:
+            raise PermissionDenied
         
         capsule_serializer = serializers.CapsuleSerializer(
             capsule,
@@ -224,7 +244,7 @@ class CapsuleDetail(APIView):
             capsule_serializer.save()
             return Response(capsule_serializer.data, status=status.HTTP_200_OK)
         
-        return Response(capsule_serializer.errors, status=status.HTTP_204_NO_CONTENT)
+        return Response(capsule_serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 
 
@@ -246,7 +266,11 @@ class MemberList(APIView):
             capsule = models.Capsule.objects.get(key=request.data.get("key", None))
 
         except models.Capsule.DoesNotExist:
-            raise Http404("Capsule doesn't exist.")
+            raise Http404
+
+        # Join if available
+        if capsule.state != models.Capsule.CREATED:
+            raise PermissionDenied
 
         fields = [x.name for x in models.Member._meta.fields]
         member_data = {x: request.data[x] for x in fields & request.data.keys()}
@@ -277,6 +301,10 @@ class MemberDetail(APIView):
             requested_member = models.Member.objects.get(id=id)
         except models.Member.DoesNotExist:
             raise Http404
+
+        # Edit if available
+        if requested_member.capsule.state != models.Capsule.CREATED:
+            raise PermissionDenied
 
         requested_member_serializer = serializers.MemberSerializer(
             requested_member,

@@ -142,8 +142,8 @@ class CapsuleSerializer(serializers.ModelSerializer):
 
     def validate_state(self, value):
         # Check if the capsule is being locked while some members aren't ready
-        if value == models.Capsule.LOCKED and not models.Member.objects.filter(status=models.Member.NOT_READY):
-            raise serializers.ValidationError("Cannot lock the capusle while some members aren're ready.")
+        if value == models.Capsule.LOCKED and self.instance.members.all().filter(status=models.Member.NOT_READY):
+            raise serializers.ValidationError("Cannot lock the capusle while some members aren't ready.")
         return value
         
 class FileSerializer(serializers.ModelSerializer):

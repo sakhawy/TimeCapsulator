@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux"
-import { Redirect, useHistory } from "react-router"
-import { resetToken } from "../store/authSlice"
+import { useHistory } from "react-router"
+import { logout } from "../store/authSlice"
 
 export default function Logout() {
     
@@ -9,9 +9,7 @@ export default function Logout() {
     const dispatch = useDispatch()
 
     function handleLogout(){
-        dispatch(resetToken())
-        localStorage.removeItem("access_token")
-        history.push("/")
+        dispatch(logout())
     }
     
     return (

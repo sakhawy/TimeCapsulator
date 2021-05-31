@@ -107,6 +107,37 @@ export const updateMemberState = createAsyncThunk(
     }
 )
 
+export const updateMemberStatus = createAsyncThunk(
+    'members/updateMemberStatus',
+    async ({memberId, status}, thunkAPI) => {
+        try{
+
+            const user = selectUser(thunkAPI.getState())
+            const profile = selectProfile(thunkAPI.getState())
+
+            const response = await axios({
+                url: `${endpoints.member}${memberId}/`,
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Token ${user.access_token}`
+                },
+                data: {
+                    status: status
+                }
+            });
+            if (response.status === 200){
+                const members = formatManyMembers([response.data])
+                return members[0]
+            }
+            else
+                return thunkAPI.rejectWithValue(response.data)
+        }
+        catch (e){
+            return thunkAPI.rejectWithValue({data: e.response.data, status: e.response.status})
+        }
+    }
+)
+
 export const memberAdapter = createEntityAdapter({
     selectId: (member) => member.id
 })
@@ -162,6 +193,20 @@ export const membersSlice = createSlice({
             
         },
         [updateMemberState.rejected]: (state, action) => {
+            state.status = 'rejected'
+
+            state.error = action.payload
+        },
+        [updateMemberStatus.pending]: (state) => {
+            state.status = 'pending'
+        },
+        [updateMemberStatus.fulfilled]: (state, action) => {
+            state.status = 'fulfilled'
+            memberAdapter.upsertOne(state, action.payload)
+            
+            
+        },
+        [updateMemberStatus.rejected]: (state, action) => {
             state.status = 'rejected'
 
             state.error = action.payload

@@ -75,6 +75,35 @@ export const createCapsule = createAsyncThunk(
     }
 )
 
+export const lockCapsule = createAsyncThunk(
+    'capsules/lockCapsule',
+    async ({capsuleKey}, thunkAPI) => {
+        try{
+
+            const user = selectUser(thunkAPI.getState())
+
+            const response = await axios({
+                url: `${endpoints.capsules}${capsuleKey}/`,
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Token ${user.access_token}`
+                },
+                data: {
+                    state: 1
+                }
+            });
+            if (response.status === 200){
+                const {capsule, members} = formatOneCapsule(response.data)
+                return capsule
+            }
+            else
+                return thunkAPI.rejectWithValue(response.data)
+        }
+        catch (e){
+            return thunkAPI.rejectWithValue({data: e.response.data, status: e.response.status})
+        }
+    }
+)
 
 const capsuleAdapter = createEntityAdapter({
     selectId: (capsule) => capsule.id
@@ -114,6 +143,17 @@ export const capsulesSlice = createSlice({
             capsuleAdapter.addOne(state, action.payload)
         },
         [createCapsule.rejected]: (state, action) => {
+            state.status = "rejected"
+            state.error = action.payload
+        },
+        [lockCapsule.pending]: (state, action) => {
+            state.status = 'pending'
+        },
+        [lockCapsule.fulfilled]: (state, action) => {
+            state.status = 'fulfilled'
+            capsuleAdapter.upsertOne(state, action.payload)
+        },
+        [lockCapsule.rejected]: (state, action) => {
             state.status = "rejected"
             state.error = action.payload
         },
