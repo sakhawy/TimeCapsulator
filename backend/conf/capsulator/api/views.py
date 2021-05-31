@@ -170,7 +170,22 @@ class CapsuleList(APIView):
         return Response(capsule_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CapsuleDetail(APIView):
-    permission_classes = [serializers.IsCapsuleAdmin, permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get(self, request, key, format=None):
+        # Check if the member is admin first
+        member = models.Member.objects.filter(capsule__key=key, user=request.user)
+        if not member:
+            raise Http404
+        
+        member = member[0]
+
+        if member.state != models.Member.ADMIN:
+            raise PermissionDenied
+
+        capsule_members = models.Member.objects.filter(capsule__key=key)
+        capsule_members_serializer = serializers.MemberSerializer(capsule_members, many=True)
+        return Response(capsule_members_serializer.data, status=status.HTTP_200_OK)        
 
     def put(self, request, key, format=None):
         try:

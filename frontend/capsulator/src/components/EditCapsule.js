@@ -3,9 +3,9 @@ import { useDispatch, useSelector } from "react-redux"
 import { useParams, useHistory, useLocation, useRouteMatch } from "react-router"
 import classname from 'classnames'
 
-import { selectCapsules, selectCapsulesStatus } from "../store/capsulesSlice"
+import { selectCapsules, selectCapsulesIds, selectCapsulesStatus } from "../store/capsulesSlice"
 import { fetchResource, selectResources, selectResourcesIds, selectResourcesStatus, updateResource, uploadResource } from "../store/resourcesSlice"
-import { selectMembers, selectMembersIds, selectMembersStatus } from "../store/membersSlice"
+import { selectMembers, selectMembersIds, selectMembersStatus, fetchCapsuleMembers, updateMemberState } from "../store/membersSlice"
 import { selectProfile } from "../store/profileSlice"
 
 
@@ -56,6 +56,56 @@ function  ImageModal({images, image, toggleModal}){
 }
 
 
+function Accordion(props){
+    const [collapse, setCollapse] = useState(false)
+
+    return (
+        <div className="flex flex-col items-center justify-center w-full h-full space-y-3">
+            <div className="w-full flex items-center justify-start">
+                <button 
+                    className="text-primary font-bold text-lg md:font-extrabold md:text-xl outline-none"
+                    onClick={() => setCollapse(!collapse)}
+                >
+                    Requests
+                </button>
+            </div>
+            {collapse === false && props.children}
+        </div>
+    )
+
+}
+
+function Requests({requestingMembers, handleRequestAction, loading}){
+    return (
+
+        <div className="relative flex flex-col items-center justify-center w-full space-y-3">
+            {loading && <Loading />}
+            {requestingMembers.map((member) => (
+                <div className="h-20 w-full flex items-center justify-center bg-primary rounded-2xl p-4 space-x-2" key={member.id}>
+                    {/* Profile pic */}
+                    <div className="flex items-center justify-center">
+                        <div className="w-16 h-18 rounded-full overflow-hidden bg-secondary">
+                            <img src="../logo.png" className="object-contain"/>
+                        </div>
+                    </div>
+                    {/* Name */}
+                    <div className="flex items-center justify-start flex-grow">
+                        <p className="md:text-xl font-bold md:font-extrabold text-secondary">
+                            {member.userName}
+                        </p>
+                    </div>
+                    {/* Button */}
+                    <div className="flex items-center justify-center space-x-1">
+                        <button className="w-10 h-10 bg-secondary text-primary rounded-l-2xl" onClick={() => handleRequestAction(member.id, true)}>1</button>
+                        <button className="w-10 h-10 bg-secondary text-primary rounded-r-2xl" onClick={() => handleRequestAction(member.id, false)}>1</button>
+                    </div>
+                </div>
+            ))}
+
+        </div>
+    )
+}
+
 function EditCapsule() {
 
     const [message, setMessage] = useState("")
@@ -67,27 +117,50 @@ function EditCapsule() {
     const [toggleModal, setToggleModal] = useState(0)
     const [modalImage, setModalImage] = useState(0)
     
+    const [isAdmin, setIsAdmin] = useState(false)
+
+    const [requestingMembers, setRequestingMembers] = useState([])
+
     const dispatch = useDispatch()
 
     const history = useHistory()
 
-    const members = useSelector(selectMembers)
     const capsulesStatus = useSelector(selectCapsulesStatus)
     
     const {id} = useParams()
+    
+    const capsules = useSelector(selectCapsules)
+    const capsulesIds = useSelector(selectCapsulesIds)
+    const memberCapsule = capsulesIds.filter(capsule => capsules[capsule].members.includes(parseInt(id)))
+    
+    const members = useSelector(selectMembers)
+    const membersStatus = useSelector(selectMembersStatus)
+    const membersIds = useSelector(selectMembersIds)
+
     useEffect(() => {
         // Validate the memeber in the dynamic url
-        if (!members[id]){
+        if (!membersIds.includes(parseInt(id))){
             setNotFound(1)
         }
+        else {
+            // Set isAdmin state
+            setIsAdmin(members[id].state === 'A')   
+            setRequestingMembers(membersIds.filter(member => members[member].capsuleId === members[id].capsuleId && members[member].state === "W"))
+        }
     }, [members])
+
+    useEffect(() => {
+        if (memberCapsule.length !== 0){
+            // dispatch(fetchCapsuleMembers({capsuleKey: capsules[memberCapsule[0]].key}))
+        } 
+    }, [memberCapsule[0]])
 
     const resources = useSelector(selectResources)
     const resourcesIds = useSelector(selectResourcesIds)
     const resourcesStatus = useSelector(selectResourcesStatus)
 
     const memberResource = resourcesIds.filter(resource => resources[resource].member === parseInt(id))
-
+    
     useEffect(() => {
         // Fetch resource if we don't have it
 
@@ -134,6 +207,10 @@ function EditCapsule() {
 
     function handleToggleModal(){
         setToggleModal(0)
+    }
+
+    function handleRequestAction(requestingMemberId, isApproved){
+        dispatch(updateMemberState({memberId: requestingMemberId, state: isApproved ? "M" : "B"}))
     }
 
     return (
@@ -219,7 +296,16 @@ function EditCapsule() {
                         </div>
                     </div>
                 </div>
-                {/* Requests */}
+                {isAdmin &&
+                    <Accordion>
+                        {/* Requests */}
+                        <Requests 
+                            requestingMembers={requestingMembers.map(member => members[member])} 
+                            handleRequestAction={handleRequestAction} 
+                            loading={membersStatus === 'pending'}
+                        />
+                    </Accordion>
+                }
                 {/* Other Members */}
             </div>
         </div>

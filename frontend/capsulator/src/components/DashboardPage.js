@@ -132,7 +132,7 @@ function Dashboard() {
     function getMemberId(capsuleMembersIds){
         // Gets the current user's member id from the capsule members list 
 
-        const userMembersIds = membersIds.filter((memberId) => members[memberId].user === profile.id)
+        const userMembersIds = membersIds.filter((memberId) => members[memberId].userId === profile.id)
         const memberId = capsuleMembersIds.filter((memberId) => userMembersIds.includes(memberId))[0]
         return memberId
     }

@@ -48,6 +48,65 @@ export const joinCapsule = createAsyncThunk(
     }
 )
 
+export const fetchCapsuleMembers = createAsyncThunk(
+    'members/fetchCapsuleMembers',
+    async({capsuleKey}, thunkAPI) => {
+        try{
+
+            const user = selectUser(thunkAPI.getState())
+            const profile = selectProfile(thunkAPI.getState())
+
+            const response = await axios({
+                url: `${endpoints.capsules}${capsuleKey}/`,
+                method: 'GET',
+                headers: {
+                    'Authorization': `Token ${user.access_token}`
+                },
+            });
+            if (response.status === 200){
+                const members = formatManyMembers(response.data)
+                return members
+            }
+            else
+                return thunkAPI.rejectWithValue(response.data)
+        }
+        catch (e){
+            return thunkAPI.rejectWithValue({data: e.response.data, status: e.response.status})
+        }
+    }
+)
+
+export const updateMemberState = createAsyncThunk(
+    'members/updateMemberState',
+    async ({memberId, state}, thunkAPI) => {
+        try{
+
+            const user = selectUser(thunkAPI.getState())
+            const profile = selectProfile(thunkAPI.getState())
+
+            const response = await axios({
+                url: `${endpoints.member}${memberId}/`,
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Token ${user.access_token}`
+                },
+                data: {
+                    state: state
+                }
+            });
+            if (response.status === 200){
+                const members = formatManyMembers([response.data])
+                return members[0]
+            }
+            else
+                return thunkAPI.rejectWithValue(response.data)
+        }
+        catch (e){
+            return thunkAPI.rejectWithValue({data: e.response.data, status: e.response.status})
+        }
+    }
+)
+
 export const memberAdapter = createEntityAdapter({
     selectId: (member) => member.id
 })
@@ -55,7 +114,7 @@ export const memberAdapter = createEntityAdapter({
 export const membersSlice = createSlice({
     name: 'members',
     initialState: memberAdapter.getInitialState({
-        status: 'pending',
+        status: 'fulfilled',
         error: null
     }),
     reducers: {
@@ -75,6 +134,34 @@ export const membersSlice = createSlice({
             
         },
         [joinCapsule.rejected]: (state, action) => {
+            state.status = 'rejected'
+
+            state.error = action.payload
+        },
+        [fetchCapsuleMembers.pending]: (state) => {
+            state.status = 'pending'
+        },
+        [fetchCapsuleMembers.fulfilled]: (state, action) => {
+            state.status = 'fulfilled'
+            memberAdapter.addMany(state, action.payload)
+            
+            
+        },
+        [fetchCapsuleMembers.rejected]: (state, action) => {
+            state.status = 'rejected'
+
+            state.error = action.payload
+        },
+        [updateMemberState.pending]: (state) => {
+            state.status = 'pending'
+        },
+        [updateMemberState.fulfilled]: (state, action) => {
+            state.status = 'fulfilled'
+            memberAdapter.upsertOne(state, action.payload)
+            
+            
+        },
+        [updateMemberState.rejected]: (state, action) => {
             state.status = 'rejected'
 
             state.error = action.payload

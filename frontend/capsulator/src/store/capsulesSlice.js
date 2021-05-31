@@ -6,6 +6,7 @@ import { instance as axios } from '../api/axios'
 import endpoints from '../api/endpoints'
 import {joinCapsule, setMembers} from './membersSlice'
 import {formatManyCapsules, formatOneCapsule} from '../formatters/capsulesFormatter'
+import { formatManyMembers } from '../formatters/membersFormatter';
 
 
 export const fetchCapsules = createAsyncThunk(
@@ -27,7 +28,7 @@ export const fetchCapsules = createAsyncThunk(
                 const {capsules, members} = formatManyCapsules(response.data)
                 
                 // Update the members
-                thunkAPI.dispatch(setMembers(members))
+                thunkAPI.dispatch(setMembers(formatManyMembers(members)))
 
                 return capsules
             }

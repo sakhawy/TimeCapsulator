@@ -4,24 +4,23 @@ from rest_framework import permissions
 
 from capsulator import models, tokens
 
-class IsCapsuleAdmin(permissions.BasePermission):
-    def has_permission(self, request, view):
-        try:
-            member = models.Member.objects.get(user=request.user)
-            print(f"Permission is {member.state}")
-            return member.state == models.Member.ADMIN
+# class IsCapsuleAdmin(permissions.BasePermission):
+#     def has_permission(self, request, view):
+#         try:
+#             member = models.Member.objects.get(user=request.user)
+#             return member.state == models.Member.ADMIN
             
-        except:
-            return False
+#         except:
+#             return False
 
-    def has_object_permission(self, request, view):
-        try:
-            member = models.Member.objects.get(user=request.user)
-            print(f"Permission is {member.state}")
-            return member.state == models.Member.ADMIN
+#     def has_object_permission(self, request, view):
+#         try:
+#             member = models.Member.objects.get(user=request.user)
+#             print(f"Permission is {member.state}")
+#             return member.state == models.Member.ADMIN
             
-        except:
-            return False
+#         except:
+#             return False
 
 class AdminOnlyField(serializers.Field):
     '''
@@ -34,22 +33,24 @@ class AdminOnlyField(serializers.Field):
         return member.state
 
     def to_internal_value(self, obj):
-        '''
-        Permitting only the 'Member.ADMIN' for writing.
-        '''
+        #### TODO: FIND A BETTER WAY TO DO THIS!!
+        # '''
+        # Permitting only the 'Member.ADMIN' for writing.
+        # '''
 
-        request = self.context.get('request', None)
-        if not request:
-            raise Exception("'request' is not found.")
-        user = request.user
+        # request = self.context.get('request', None)
+        # if not request:
+        #     raise Exception("'request' is not found.")
+        # user = request.user
 
-        try:
-            member = models.Member.objects.get(user=user)
-            if not member.state == models.Member.ADMIN:
-                raise serializers.ValidationError(f"Unauthorized write to the field '{self.field_name}'.")     
-            return obj
-        except models.Member.DoesNotExist:
-            raise Exception("'member' is not found.")
+        # try:
+        #     member = models.Member.objects.get(user=user)
+        #     if not member.state == models.Member.ADMIN:
+        #         raise serializers.ValidationError(f"Unauthorized write to the field '{self.field_name}'.")     
+        #     return obj
+        # except models.Member.DoesNotExist:
+        #     raise Exception("'member' is not found.")
+        return obj
 
 class TokenSerializer(serializers.ModelSerializer):
     class Meta:
