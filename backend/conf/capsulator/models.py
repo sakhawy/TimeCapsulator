@@ -185,7 +185,7 @@ def handle_membership(sender, instance, created, **kwargs):
                 raise ObjectAlreadyExist()
 
 class Resource(models.Model):
-    member = models.OneToOneField(Member, on_delete=models.CASCADE)
+    member = models.OneToOneField(Member, on_delete=models.CASCADE, related_name="resource")
     message = models.CharField(max_length=10000)
 
     def __str__(self):

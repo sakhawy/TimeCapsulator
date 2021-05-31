@@ -35,6 +35,38 @@ export const fetchResource = createAsyncThunk(
     }
 )
 
+export const fetchCapsuleResources = createAsyncThunk(
+    'resources/fetchCapsuleResources',
+    async({capsuleKey}, thunkAPI) => {
+        try{
+
+            const user = selectUser(thunkAPI.getState())
+
+            const response = await axios({
+                url: `${endpoints.resource}`,
+                method: 'GET',
+                headers: {
+                    'Authorization': `Token ${user.access_token}`,
+                },
+                params: {
+                    key: capsuleKey
+                }
+                
+            });
+            if (response.status === 200){
+                const {resources} = formatManyResources(response.data)
+                return resources
+            }
+            else{
+                return thunkAPI.rejectWithValue(response.data)
+            }
+        }
+        catch (e){
+            return thunkAPI.rejectWithValue({data: e.response.data, status: e.response.status})
+            }
+    }
+)
+
 export const uploadResource = createAsyncThunk(
     'resources/uploadResource',
     async({
@@ -178,6 +210,19 @@ export const resourcesSlice = createSlice({
             
         },
         [fetchResource.rejected]: (state, action) => {
+            state.status = 'rejected'
+
+            state.error = action.payload
+        },
+        [fetchCapsuleResources.pending]: (state) => {
+            state.status = 'pending'
+        },
+        [fetchCapsuleResources.fulfilled]: (state, action) => {
+            state.status = 'fulfilled'
+            resourceAdapter.addMany(state, action.payload)
+            
+        },
+        [fetchCapsuleResources.rejected]: (state, action) => {
             state.status = 'rejected'
 
             state.error = action.payload

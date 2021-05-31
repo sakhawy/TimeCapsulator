@@ -69,6 +69,25 @@ class UserDetail(APIView):
 
 class ResourceList(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, format=None):
+        "Returns a list of 'Resource's from a give capsule key"
+        try:
+            capsule = models.Capsule.objects.get(key=request.GET.get("key", None))
+        except models.Capsule.DoesNotExist:
+            raise Http404
+
+        # Check that user is authorized
+        try:
+            member = models.Member.objects.filter(user=request.user, capsule=capsule)[0]
+        except IndexError:
+            raise PermissionDenied
+
+        capsule_resources = models.Resource.objects.filter(member__in=capsule.members.all())
+        capsule_resources_serializer = serializers.ResourceSerializer(capsule_resources, many=True)
+        return Response(capsule_resources_serializer.data, status=status.HTTP_200_OK)
+
+
+
     ### ADD META
     def post(self, request, format=None):
         "Creates a resource with its image files for the requesting user."

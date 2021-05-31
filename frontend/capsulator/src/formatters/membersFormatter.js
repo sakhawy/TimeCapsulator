@@ -3,6 +3,7 @@ export const formatOneMember = ({
         id,
         user, 
         capsule, 
+        resource,
         state, 
         status, 
         user_name, 
@@ -11,6 +12,7 @@ export const formatOneMember = ({
         id,
         userId: user, 
         capsuleId: capsule, 
+        resourceId: resource,
         state, 
         status, 
         userName: user_name

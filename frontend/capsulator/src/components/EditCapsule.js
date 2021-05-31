@@ -4,7 +4,7 @@ import { useParams, useHistory, useLocation, useRouteMatch } from "react-router"
 import classname from 'classnames'
 
 import { selectCapsules, selectCapsulesIds, selectCapsulesStatus } from "../store/capsulesSlice"
-import { fetchResource, selectResources, selectResourcesIds, selectResourcesStatus, updateResource, uploadResource } from "../store/resourcesSlice"
+import { fetchCapsuleResources, fetchResource, fetchResources, selectResources, selectResourcesIds, selectResourcesStatus, updateResource, uploadResource } from "../store/resourcesSlice"
 import { selectMembers, selectMembersIds, selectMembersStatus, fetchCapsuleMembers, updateMemberState } from "../store/membersSlice"
 import { selectProfile } from "../store/profileSlice"
 
@@ -62,12 +62,12 @@ function Accordion(props){
     return (
         <div className="flex flex-col items-center justify-center w-full h-full space-y-3">
             <div className="w-full flex items-center justify-start">
-                <button 
-                    className="text-primary font-bold text-lg md:font-extrabold md:text-xl outline-none"
+                <div 
+                    className="text-primary font-bold text-lg md:font-extrabold md:text-xl outline-none cursor-pointer select-none"
                     onClick={() => setCollapse(!collapse)}
                 >
-                    Requests
-                </button>
+                    {props.name}
+                </div>
             </div>
             {collapse === false && props.children}
         </div>
@@ -90,7 +90,7 @@ function Requests({requestingMembers, handleRequestAction, loading}){
                     </div>
                     {/* Name */}
                     <div className="flex items-center justify-start flex-grow">
-                        <p className="md:text-xl font-bold md:font-extrabold text-secondary">
+                        <p className="md:text-xl font-bold text-sm md:font-extrabold text-secondary">
                             {member.userName}
                         </p>
                     </div>
@@ -103,6 +103,100 @@ function Requests({requestingMembers, handleRequestAction, loading}){
             ))}
 
         </div>
+    )
+}
+
+function OtherMembers(props){
+    const [toggleContent, setToggleContent] = useState([]) // List for each member
+
+    function MemberHeader(props){
+        const [toggle, setToggle] = useState(true)
+        return(
+            <div className="w-full h-full">
+
+                <div 
+                    className={classname("flex-grow flex space-x-2 justify-center cursor-pointer select-none w-full", {"border-primary border-b-2": toggle})}
+                    onClick={() => setToggle(!toggle)}
+                    >
+                    <div className="flex items-center justify-center">
+                        <div className="w-16 h-18 rounded-tl-2xl overflow-hidden bg-primary">
+                            <img src="../logo.png" className="object-contain"/>
+                        </div>
+                    </div>
+                    <div className="flex items-center justify-start flex-grow">
+                        <p className="md:text-xl font-bold md:font-extrabold text-primary">
+                            {props.member.userName}
+                        </p>
+                    </div> 
+                </div>
+                <div className={classname("w-full h-full", {"p-6": toggle})}>
+                    {toggle === true && props.children}
+                </div>
+            </div>
+        )
+    }
+
+    function MemberBody(props){
+        const [toggleModal, setToggleModal] = useState(false)
+        const [modalImage, setModalImage] = useState(false)
+        
+        return (
+            <div className="w-full h-full">
+                {toggleModal === true && <ImageModal image={modalImage} images={props.resource.images} toggleModal={() => setToggleModal(!toggleModal)}/>}
+
+            <div className="w-full h-fullflex flex-col items-start justify-center space-y-3">
+                {/* Message */}
+                <div className="flex-grow text-primary">
+                    <div>
+                        <p className="text-sm md:text-xl font-semibold md:font-bold ">
+                            Message
+                        </p>
+                        <p className="text-sm md:text-xl italic">
+                            BODYYYYYYYYYYYYy
+                        </p>
+                    </div>
+                </div>
+                {/* Images */}
+                <div className="flex-grow text-primary">
+                        <p className="text-sm md:text-xl font-semibold md:font-bold ">
+                            Images
+                        </p>
+                        <div className="flex items-center justify-start flex-wrap">
+                            {props.resource.images.map(image => {return (
+                                <div 
+                                    className="flex md:h-44 md:w-44 w-24 h-24 bg-primary m-1 p-1 rounded-xl cursor-pointer" 
+                                    key={props.resource.images.indexOf(image)}
+                                    onClick={() => { setToggleModal(true); setModalImage(props.resource.images.indexOf(image))}}    
+                                >
+                                    <img src={image} className="rounded-xl object-cover"/>
+                                </div>
+                            )})}
+                        </div>
+                </div>
+            </div>
+        </div>
+        )
+    }
+
+    return (
+        <div className="flex flex-col space-y-2 items-center justify-center w-full">
+            {/* Member */}
+            <div className="flex flex-col justify-center items-start w-full space-y-3"
+                // onClick={}
+            >
+                {props.members.map(member => {
+                    const resource = props.resources.filter(resource => resource.memberId === parseInt(member.id))
+                    return (
+                        <div className="border-primary border-2 w-full h-full rounded-3xl overflow-hidden" key={member.id}>
+                            <MemberHeader key={member.id} member={member} key={member.id}>
+                                {resource.length > 0 && <MemberBody resource={resource[0]}/>}
+                                {resource.length === 0 && <p className="text-sm md:text-xl font-semibold md:font-bold text-primary">Nothing was submitted.</p>}
+                            </MemberHeader>
+                        </div>
+
+                )})}
+            </div>
+        </div>    
     )
 }
 
@@ -131,11 +225,17 @@ function EditCapsule() {
     
     const capsules = useSelector(selectCapsules)
     const capsulesIds = useSelector(selectCapsulesIds)
-    const memberCapsule = capsulesIds.filter(capsule => capsules[capsule].members.includes(parseInt(id)))
-    
     const members = useSelector(selectMembers)
     const membersStatus = useSelector(selectMembersStatus)
     const membersIds = useSelector(selectMembersIds)
+    const resources = useSelector(selectResources)
+    const resourcesIds = useSelector(selectResourcesIds)
+    const resourcesStatus = useSelector(selectResourcesStatus)
+    
+    
+    const memberCapsule = capsulesIds.filter(capsule => capsules[capsule].members.includes(parseInt(id)))
+    const capsuleMembers = membersIds.filter(member => members[member].capsuleId === parseInt(memberCapsule[0]))
+    const capsuleResources = resourcesIds.filter(resource => resources[resource])
 
     useEffect(() => {
         // Validate the memeber in the dynamic url
@@ -151,23 +251,20 @@ function EditCapsule() {
 
     useEffect(() => {
         if (memberCapsule.length !== 0){
-            // dispatch(fetchCapsuleMembers({capsuleKey: capsules[memberCapsule[0]].key}))
+            // To make sure we're up to date
+            dispatch(fetchCapsuleMembers({capsuleKey: capsules[memberCapsule[0]].key}))
+            // Getting the resources
+            dispatch(fetchCapsuleResources({capsuleKey:capsules[memberCapsule[0]].key})) 
         } 
     }, [memberCapsule[0]])
 
-    const resources = useSelector(selectResources)
-    const resourcesIds = useSelector(selectResourcesIds)
-    const resourcesStatus = useSelector(selectResourcesStatus)
-
-    const memberResource = resourcesIds.filter(resource => resources[resource].member === parseInt(id))
+    const memberResource = resourcesIds.filter(resource => resources[resource].memberId === parseInt(id))
     
     useEffect(() => {
         // Fetch resource if we don't have it
 
         
-        if (!memberResource.length){
-            dispatch(fetchResource({memberId: id}))
-        } else {
+        if (memberResource.length){
             // We have the resource; render its content
             setMessage(resources[memberResource[0]].message)
             setImagesURLs(resources[memberResource[0]].images)
@@ -198,7 +295,10 @@ function EditCapsule() {
             setImages(e.target.files)
 
             const files = Array.from(e.target.files).map(file => URL.createObjectURL(file)) 
-            setImagesURLs(files.concat(resources[memberResource].images))
+            setImagesURLs(files)
+            if (memberResource.length > 0){
+                setImagesURLs(files.concat(resources[memberResource[0]].images))
+            }
     
             // Prevent leaks
             Array.from(e.target.files).map(file => URL.revokeObjectURL(file))
@@ -297,7 +397,7 @@ function EditCapsule() {
                     </div>
                 </div>
                 {isAdmin &&
-                    <Accordion>
+                    <Accordion name="Requests">
                         {/* Requests */}
                         <Requests 
                             requestingMembers={requestingMembers.map(member => members[member])} 
@@ -307,6 +407,9 @@ function EditCapsule() {
                     </Accordion>
                 }
                 {/* Other Members */}
+                <Accordion name="Other Members">
+                    {capsuleMembers.length > 0 && capsuleResources.length > 0 && <OtherMembers members={capsuleMembers.map(member => members[member]).filter(member => member.state === 'M')} resources={capsuleResources.map(resource => resources[resource])}/>}
+                </Accordion>
             </div>
         </div>
     )

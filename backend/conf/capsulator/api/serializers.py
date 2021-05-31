@@ -91,7 +91,7 @@ class UserSerializer(serializers.ModelSerializer):
 class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Member
-        fields = ["id", "user", "capsule", "state", "status", "user_name"]
+        fields = ["id", "user", "capsule", "state", "status", "user_name", "resource"]
 
         # API exception for when user creates 2 Member instances.
         validators = [
@@ -104,9 +104,16 @@ class MemberSerializer(serializers.ModelSerializer):
 
     state = AdminOnlyField(required=False)
     user_name = serializers.SerializerMethodField('get_user_name')
+    resource = serializers.SerializerMethodField('get_resource')
 
     def get_user_name(self, member):
         return f"{member.user.first_name} {member.user.last_name}"
+
+    def get_resource(self, member):
+        try:
+            return member.resource.id
+        except:
+            return None
 
     def validate_state(self, value):
         # Validation for illegal action
