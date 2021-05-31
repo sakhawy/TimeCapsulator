@@ -106,7 +106,7 @@ function Requests({requestingMembers, handleRequestAction, loading}){
     )
 }
 
-function OtherMembers(props){
+export function OtherMembers(props){
     const [toggleContent, setToggleContent] = useState([]) // List for each member
 
     function MemberHeader(props){

@@ -70,7 +70,7 @@ function CapsuleDetailsModal({name, creationDate, unlockDate, creators, toggleMo
     )
 }
 
-function Capsule({capsule, countdown, toggleModal, handleLock}) {
+function Capsule({capsule, countdown, toggleModal, handleLock, handleUnlock}) {
     return(
         <div className="flex justify-center items-center h-16 bg-primary rounded-2xl overflow-hide">
             {/* Logo */}
@@ -95,10 +95,11 @@ function Capsule({capsule, countdown, toggleModal, handleLock}) {
                 <button 
                     id={capsule.id}
                     className={classname("text-primary text-xs font-semibold md:text-bold md:text-xl w-full h-full outline-none", {"opacity-50 cursor-not-allowed": capsule.state === 1})}
-                    onClick={(e) => capsule.state === 0 && handleLock(e)}
+                    onClick={(e) => capsule.state === 0 && handleLock(e) || capsule.state === 2 && handleUnlock(e)}
                 >
                     {capsule.state === 0 && "Lock"}
                     {capsule.state === 1 && "Locked"}
+                    {capsule.state === 2 && "Unlock"}
                 </button>
             </div>
         </div>
@@ -144,6 +145,14 @@ function Dashboard() {
             history.push(`/edit/${memberId}`)
         }
     }
+    
+    function handleUnlock(e){
+        const capsule = capsules[e.target.id]
+        if (capsule){
+            const memberId = getMemberId(capsule.members)
+            history.push(`/view/${memberId}`)
+        }
+    }
 
     return (
         // dummy div for modal
@@ -153,7 +162,7 @@ function Dashboard() {
                     toggleModal={() => toggleModal(!modalIsActive)}
                     name={capsules[modalCapsuleId].name}
                     creationDate={capsules[modalCapsuleId].creationDate}    
-                    unlockDate={capsules[modalCapsuleId].unlockDate}
+                    unlockDate={capsules[modalCapsuleId].unlockingDate}
                     creators={capsules[modalCapsuleId].members.map(id => members[id].user_name)}    
                 />}
             <div className="bg-secondary min-h-128 rounded-b-2xl p-6 space-y-2">
@@ -170,6 +179,7 @@ function Dashboard() {
                                     key={capsules[capsule].id} 
                                     capsule={capsules[capsule]} 
                                     handleLock={handleLock}
+                                    handleUnlock={handleUnlock}
                                     countdown={"zby"} toggleModal={() => toggleModal(!modalIsActive, capsules[capsule].id)
                                 }/>
                         )})

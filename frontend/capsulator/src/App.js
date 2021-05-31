@@ -15,6 +15,7 @@ import EditCapsule from './components/EditCapsule';
 import { fetchProfile } from './store/profileSlice';
 import { fetchCapsules, selectCapsules, selectCapsulesIds, selectCapsulesStatus } from './store/capsulesSlice'
 import JoinCapsule from './components/JoinCapsule';
+import ViewCapsule from './components/ViewCapsule';
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
     Dashboard: "/dashboard",
     Create: "/create",
     Edit: "/edit",
+    View: "/view",
     Join: "/join",
     Logout: "/logout",
   }
@@ -133,6 +135,7 @@ function App() {
                 <ProtectedRoute path={`${routes.Logout}`} component={Logout} redirection={`${routes.AuthPage}`}/>
                 <ProtectedRoute path={`${routes.Create}`} component={Create} redirection={`${routes.AuthPage}`}/>
                 <ProtectedRoute path={`${routes.Edit}/:id`} component={EditCapsule} redirection={`${routes.AuthPage}`}/>
+                <ProtectedRoute path={`${routes.View}/:id`} component={ViewCapsule} redirection={`${routes.AuthPage}`}/>
                 <ProtectedRoute path={`${routes.Join}`} component={JoinCapsule} redirection={`${routes.AuthPage}`}/>
               </Switch>
           </div>

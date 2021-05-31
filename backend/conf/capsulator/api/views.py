@@ -83,7 +83,7 @@ class ResourceList(APIView):
             raise PermissionDenied
 
         # View if available
-        if capsule.state != models.Capsule.CREATED:
+        if capsule.state not in [models.Capsule.CREATED, models.Capsule.UNLOCKED]:
             raise PermissionDenied
 
         capsule_resources = models.Resource.objects.filter(member__in=capsule.members.all())
@@ -144,7 +144,7 @@ class ResourceDetail(APIView):
             raise Http404
         
         # View if available
-        if member.capsule.state != models.Capsule.CREATED:
+        if member.capsule.state not in [models.Capsule.CREATED, models.Capsule.UNLOCKED]:
             raise PermissionDenied
 
         resource_serializer = serializers.ResourceSerializer(resource)
