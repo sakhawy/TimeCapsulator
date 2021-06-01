@@ -334,4 +334,4 @@ class MemberDetail(APIView):
             requested_member_serializer.save()
             return Response(requested_member_serializer.data, status=status.HTTP_200_OK)
         
-        return Response(requested_member_serializer.errors, status=status.HTTP_204_NO_CONTENT)
+        return Response(requested_member_serializer.errors, status=status.HTTP_403_FORBIDDEN)

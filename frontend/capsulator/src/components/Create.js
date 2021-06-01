@@ -62,6 +62,7 @@ function Create() {
     const [publicButton, setPublicButton] = useState(0)
     const [name, setName] = useState("")
     const [unlockingDate, setUnlockingDate] = useState("")
+    const [validUnlockingDate, setValidUnlockingDate] = useState(true)
     
     const [created, setCreated] = useState(0)
     
@@ -105,7 +106,22 @@ function Create() {
         if (name && unlockingDate && profile){
             dispatch(createCapsule({name: name, unlockingDate: unlockingDate, member: profile.id, public: publicButton}))
             setCreated(1)
+            return true
         }   
+    }
+
+    function handleNameChange(e){
+        setName(e.target.value)
+    }
+
+    function handleDateChange(e){
+        if (+Date.parse(e.target.value) > +Date.now() + 1000*60*60*24){
+            setUnlockingDate(e.target.value)
+        } 
+        // else {
+        //     const now = new Date() 
+        //     setUnlockingDate(`${now.getFullYear().toString().padStart(2, "0")}-${now.getMonth().toString().padStart(2, "0")}-${now.getDay().toString().padStart(2, "0")}`)
+        // }
     }
 
     return (
@@ -125,7 +141,7 @@ function Create() {
                         <input 
                             className="bg-primary text-secondary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-4/6 h-full rounded-r-2xl" 
                             type="text"
-                            onChange={(e) => {setName(e.target.value)}}
+                            onChange={handleNameChange}
                             />
                     </div>
                     {/* Choose unlock date */}
@@ -136,7 +152,8 @@ function Create() {
                         <input 
                             className="bg-primary text-secondary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-4/6 h-full rounded-r-2xl" 
                             type="date"
-                            onChange={(e) => {setUnlockingDate(e.target.value)}}
+                            value={unlockingDate}
+                            onChange={handleDateChange}
                             />
                     </div>
                     {/* Choose share & make public */}

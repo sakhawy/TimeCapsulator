@@ -208,7 +208,7 @@ function Edit(props){
     const [toggleModal, setToggleModal] = useState(false)
     const [modalInitImage, setModalInitImage] = useState(0) // Index into renderImages
     const [disableSubmit, setDisableSubmit] = useState(0)
-    const [disableReady, setDisableReady] = useState(1)
+    const [disableReady, setDisableReady] = useState(0)
     const [disableLock, setDisableLock] = useState(1)
 
     useEffect(() => {

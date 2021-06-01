@@ -131,6 +131,18 @@ class MemberSerializer(serializers.ModelSerializer):
         
         return value
 
+    def validate_status(self, value):
+        # Check if there's a resource before getting ready
+        if value == models.Member.READY:
+            try:
+                if self.instance.resource.message and self.instance.resource.images:
+                    return value
+            except:
+                raise serializers.ValidationError("Cannot get ready without submitting something first")
+            else:
+                raise serializers.ValidationError("Cannot get ready without submitting something first")
+        return value
+
 class CapsuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Capsule
@@ -145,7 +157,7 @@ class CapsuleSerializer(serializers.ModelSerializer):
         if value == models.Capsule.LOCKED and self.instance.members.all().filter(status=models.Member.NOT_READY):
             raise serializers.ValidationError("Cannot lock the capusle while some members aren't ready.")
         return value
-        
+
 class FileSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.File
