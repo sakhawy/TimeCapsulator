@@ -220,6 +220,6 @@ export const selectMembersStatus = (state) => state.members.status
 export const selectMembersError = (state) => state.members.error
 
 
-export const {addMember, addMembers, setMember, setMembers} = membersSlice.actions
+export const {addMember, addMembers, setMember, setMembers, updateMember} = membersSlice.actions
 
 export default membersSlice.reducer;

@@ -200,27 +200,207 @@ export function OtherMembers(props){
     )
 }
 
-function EditCapsule() {
+function Edit(props){
+    const [emptySubmission, setEmptySubmission] = useState(false)
+    const [message, setMessage] = useState(props.message)
+    const [renderImages, setRenderImages] = useState(props.renderImages)
+    const [uploadImages, setUploadImages] = useState([])
+    const [toggleModal, setToggleModal] = useState(false)
+    const [modalInitImage, setModalInitImage] = useState(0) // Index into renderImages
+    const [disableSubmit, setDisableSubmit] = useState(0)
+    const [disableReady, setDisableReady] = useState(1)
+    const [disableLock, setDisableLock] = useState(1)
 
-    const [message, setMessage] = useState("")
-    const [imagesURLs, setImagesURLs] = useState([])    // Images from the server (or client) to be displayed
-    const [images, setImages] = useState([])    // Images to be actually uploaded
-    const [emptySubmission, setEmptySubmission] = useState(0)
+    useEffect(() => {
+        if (message){
+            if (message === props.message && uploadImages.length === 0){
+                setDisableSubmit(1)
+                // User must upload a resource to be Ready
+                if (props.members[props.memberId].resourceId !== undefined)
+                    setDisableReady(0)
+            }
+        }
+    }, [])
+
+    useEffect(() => {
+        if (props.members[props.memberId].status === "R") {
+            setDisableLock(0) 
+        } else {
+            setDisableLock(1)
+        }
+    }, [props.members[props.memberId].status])
+
+    function handleImageChange(e){
+        // sets the uploadImages & renderImages
+
+        if (e.target.files){
+            // For uploading
+            setUploadImages(e.target.files)
+
+            // For previewing
+            const files = Array.from(e.target.files).map(file => URL.createObjectURL(file)) 
+            setRenderImages(props.renderImages ? files.concat(props.renderImages) : files)  // Concatenate with images from the server
     
+            // Prevent leaks
+            Array.from(e.target.files).map(file => URL.revokeObjectURL(file))
+        }
+        handleFormValidation()
+    }
+
+    function handleMessageChange(e){
+        setMessage(e.target.value)
+        handleFormValidation()
+    }
+
+    function handleFormValidation(){
+        // Updating anything will enable the submit button again.
+        if (disableSubmit){
+            setDisableSubmit(0)
+            setEmptySubmission(0)
+        }
+    }
+
+    function handleToggleModal(){
+        setToggleModal(!toggleModal)
+    }
+
+    return (
+        <div className="w-full h-full">
+            {toggleModal === 1 && <ImageModal images={renderImages} image={modalInitImage} toggleModal={handleToggleModal}/>}
+            <div className="flex flex-col flex-grow justify-center items-center w-full space-y-2">
+                {/* Message */}
+                <div className="w-full flex flex-grow flex-col justify-center items-center">
+                    <div className="flex flex-grow justify-center items-center w-full h-1/12">
+                        <div className="flex justify-center items-center w-2/6 bg-primary rounded-t-lg h-full p-2">
+                            <p className="text-secondary font-semibold md:font-bold md:text-xl">Message</p>
+                        </div>
+                    </div>
+                    <div 
+                        type="text" 
+                        className={
+                            classname(
+                                "p-2 bg-primary text-secondary text-sm font-semibold md:font-bold md:text-lg flex-grow w-full h-11/12 rounded-2xl overflow-hidden", 
+                                {
+                                    "outline-primary": emptySubmission && message === props.message
+                                }
+                            )}
+                    >
+                        <textarea 
+                            className="resize-none bg-primary text-secondary w-full h-full rounded-2xl outline-none"
+                            onChange={handleMessageChange}
+                            value={message}
+                        ></textarea>
+
+                    </div>
+                </div>
+                {/* File upload */}
+                <div className="w-full flex flex-grow flex-col justify-center items-center">
+                    {/* Title */}
+                    <div className="flex flex-grow justify-center items-center w-full h-1/12">
+                        <div className="flex justify-center items-center w-2/6 bg-primary rounded-t-lg h-full p-2">
+                            <p className="text-secondary font-semibold md:font-bold md:text-xl">Upload</p>
+                        </div>
+                    </div>
+                    {/* Body */}
+                    <div 
+                        type="text" 
+                        className={classname(
+                                "space-y-2 flex flex-col p-2 bg-primary text-secondary text-sm font-semibold md:font-bold md:text-lg outline-none flex-grow w-full h-11/12 rounded-2xl", 
+                                {"outline-primary": emptySubmission && !uploadImages.length}
+                            )}
+                    >
+                        {/* Upload button */}
+                        <div className="flex flex-grow justify-center items-center w-full h-1/6">
+                            <label 
+                                className="flex items-center justify-center rounded-md bg-secondary text-primary h-10 w-48 font-bold text-2xl cursor-pointer"
+                            >
+                                <p>
+                                    Select Files
+                                </p>
+                                <input type="file" className="hidden" onChange={handleImageChange} multiple/>
+                            </label>
+                        </div>
+                        <div className="flex flex-grow flex-wrap justify-center items-center w-full h-5/6 ">
+                            {renderImages && renderImages.map(image => {return (
+                                <div 
+                                    className="flex md:h-44 md:w-44 w-24 h-24 bg-secondary m-1 p-1 rounded-xl cursor-pointer" 
+                                    key={renderImages.indexOf(image)}
+                                    onClick={() => { setToggleModal(1); setModalInitImage(renderImages.indexOf(image))}}    
+                                >
+                                    <img src={image} className="rounded-xl object-cover"/>
+                                </div>
+                            )})}
+                        </div>
+                    </div>
+                </div>
+                <div className="flex flex-grow h-16 w-full items-center justify-center">
+                    <div className="flex flex-row flex-grow justify-center items-center w-full h-full space-x-2">
+                        <button 
+                            className={
+                                classname(
+                                    "h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-2xl w-3/6",
+                                    {"opacity-50 cursor-not-allowed": disableSubmit}
+                                )
+                            }
+                            onClick={
+                                () => {
+                                    // Detect change
+                                    if (message && uploadImages.length > 0 && !disableSubmit){
+                                        setEmptySubmission(0)
+                                        props.handleSubmit(message, uploadImages)
+                                        }
+                                    else {
+                                        setEmptySubmission(1)
+                                    }
+                                }
+                            }
+                        >
+                            Submit
+                        </button>
+                        
+                        <button 
+                            className={
+                                classname(
+                                    "h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-2xl w-3/6",
+                                    {"opacity-50 cursor-not-allowed": disableReady}
+                                )
+                            }
+                            onClick={(e) => {!disableReady && props.handleReady(e)}}
+                        >
+                            {props.members[props.memberId] && props.members[props.memberId].status === "R" ? "Not-Ready" : "Ready"}
+                        </button>
+
+                        {props.isAdmin && 
+                            <button 
+                            className={
+                                classname(
+                                    "h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-2xl w-3/6",
+                                    {"opacity-50 cursor-not-allowed": disableLock}
+                                )
+                            }
+                            onClick={(e) => {!disableLock && props.handleLock(e)}}
+                            >
+                                Lock
+                            </button>
+                        }
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    )
+}
+
+function EditCapsule() {   
     const [notFound, setNotFound] = useState(0)
-    const [toggleModal, setToggleModal] = useState(0)
-    const [modalImage, setModalImage] = useState(0)
-    
+
     const [isAdmin, setIsAdmin] = useState(false)
 
     const [requestingMembers, setRequestingMembers] = useState([])
 
     const dispatch = useDispatch()
 
-    const history = useHistory()
-
-    const capsulesStatus = useSelector(selectCapsulesStatus)
-    
     const {id} = useParams()
     
     const capsules = useSelector(selectCapsules)
@@ -232,7 +412,6 @@ function EditCapsule() {
     const resourcesIds = useSelector(selectResourcesIds)
     const resourcesStatus = useSelector(selectResourcesStatus)
     const profile = useSelector(selectProfile)
-    
     
     const memberCapsule = capsulesIds.filter(capsule => capsules[capsule].members.includes(parseInt(id)))
     const capsuleMembers = membersIds.filter(member => members[member].capsuleId === parseInt(memberCapsule[0]))
@@ -263,53 +442,14 @@ function EditCapsule() {
 
     const memberResource = resourcesIds.filter(resource => resources[resource].memberId === parseInt(id))
     
-    useEffect(() => {
-        // Fetch resource if we don't have it
-
-        
-        if (memberResource.length){
-            // We have the resource; render its content
-            setMessage(resources[memberResource[0]].message)
-            setImagesURLs(resources[memberResource[0]].images)
-        }
-
-    }, [resources])
-
-    function handleSubmit(){
-        if (message && images){
-            setEmptySubmission(0)
-
-            // POST request when no existing resource
-            const resourceExists = !(memberResource.length === 0)
-            if (!resourceExists){
-                dispatch(uploadResource({memberId:id, message: message, images:images}))
-            } else {
-                dispatch(updateResource({memberId:id, message: message, images:images}))
-            }
-
+    function handleSubmit(message, uploadImages){
+        // POST request when no existing resource
+        const resourceExists = !(memberResource.length === 0)
+        if (!resourceExists){
+            dispatch(uploadResource({memberId:id, message: message, images:uploadImages}))
         } else {
-            setEmptySubmission(1)
+            dispatch(updateResource({memberId:id, message: message, images:uploadImages}))
         }
-    }
-
-
-    function handleImageChange(e){
-        if (e.target.files){
-            setImages(e.target.files)
-
-            const files = Array.from(e.target.files).map(file => URL.createObjectURL(file)) 
-            setImagesURLs(files)
-            if (memberResource.length > 0){
-                setImagesURLs(files.concat(resources[memberResource[0]].images))
-            }
-    
-            // Prevent leaks
-            Array.from(e.target.files).map(file => URL.revokeObjectURL(file))
-        }
-    }
-
-    function handleToggleModal(){
-        setToggleModal(0)
     }
 
     function handleRequestAction(requestingMemberId, isApproved){
@@ -336,98 +476,21 @@ function EditCapsule() {
     }
 
     return (
-        <div className="bg-secondary relative overflow-hidden rounded-2xl">
-            {toggleModal === 1 && <ImageModal images={imagesURLs} image={modalImage} toggleModal={handleToggleModal}/>}
+        <div className="bg-secondary relative overflow-hidden rounded-b-2xl">
             {/* Dummy Flex */}
             <div className="flex flex-col justify-center items-center p-4">
                 {resourcesStatus === 'pending' && <Loading />}
-                {/* Edit Portion */}
-                <div className="flex flex-col flex-grow justify-center items-center w-full space-y-2">
-                    {/* Message */}
-                    <div className="w-full flex flex-grow flex-col justify-center items-center">
-                        <div className="flex flex-grow justify-center items-center w-full h-1/12">
-                            <div className="flex justify-center items-center w-2/6 bg-primary rounded-t-lg h-full p-2">
-                                <p className="text-secondary font-semibold md:font-bold md:text-xl">Message {emptySubmission === 1 && "*"}</p>
-                            </div>
-                        </div>
-                        <div 
-                            type="text" 
-                            className={classname("p-2 bg-primary text-secondary text-sm font-semibold md:font-bold md:text-lg flex-grow w-full h-11/12 rounded-2xl overflow-hidden", {"outline-primary": emptySubmission && !message})}
-                        >
-                            <textarea 
-                                className="resize-none bg-primary text-secondary w-full h-full rounded-2xl outline-none"
-                                onChange={(e) => {setMessage(e.target.value)}}
-                                value={message}
-                            ></textarea>
-
-                        </div>
-                    </div>
-                    {/* File upload */}
-                    <div className="w-full flex flex-grow flex-col justify-center items-center">
-                        {/* Title */}
-                        <div className="flex flex-grow justify-center items-center w-full h-1/12">
-                            <div className="flex justify-center items-center w-2/6 bg-primary rounded-t-lg h-full p-2">
-                                <p className="text-secondary font-semibold md:font-bold md:text-xl">Upload {emptySubmission === 1 && "*"}</p>
-                            </div>
-                        </div>
-                        {/* Body */}
-                        <div 
-                            type="text" 
-                            className={classname("space-y-2 flex flex-col p-2 bg-primary text-secondary text-sm font-semibold md:font-bold md:text-lg outline-none flex-grow w-full h-11/12 rounded-2xl", {"outline-primary": emptySubmission && !imagesURLs.length})}
-                        >
-                            {/* Upload button */}
-                            <div className="flex flex-grow justify-center items-center w-full h-1/6">
-                                <label 
-                                    className="flex items-center justify-center rounded-md bg-secondary text-primary h-10 w-48 font-bold text-2xl cursor-pointer"
-                                >
-                                    <p>
-
-                                        Select Files
-                                    </p>
-                                    <input type="file" className="hidden" onChange={handleImageChange} multiple/>
-                                </label>
-                            </div>
-                            <div className="flex flex-grow flex-wrap justify-center items-center w-full h-5/6 ">
-                                {imagesURLs && imagesURLs.map(image => {return (
-                                    <div 
-                                        className="flex md:h-44 md:w-44 w-24 h-24 bg-secondary m-1 p-1 rounded-xl cursor-pointer" 
-                                        key={imagesURLs.indexOf(image)}
-                                        onClick={() => { setToggleModal(1); setModalImage(imagesURLs.indexOf(image))}}    
-                                    >
-                                        <img src={image} className="rounded-xl object-cover"/>
-                                    </div>
-                                )})}
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex flex-grow h-16 w-full items-center justify-center">
-                        <div className="flex flex-row flex-grow justify-center items-center w-full h-full space-x-2">
-                            <button 
-                                className="h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-2xl w-3/6"
-                                onClick={() => handleSubmit()}
-                            >
-                                Submit
-                            </button>
-                            
-                            <button 
-                                className="h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-2xl w-3/6"
-                                onClick={handleReady}
-                            >
-                                {members[id] && members[id].status === "R" ? "Not-Ready" : "Ready"}
-                            </button>
-
-                            {isAdmin && 
-                                <button 
-                                    className="h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-2xl w-3/6"
-                                    onClick={handleLock}
-                                >
-                                    Lock
-                                </button>
-                            }
-                            
-                        </div>
-                    </div>
-                </div>
+                {membersIds.length > 0 && <Edit 
+                    handleSubmit={handleSubmit}
+                    handleReady={handleReady}
+                    handleLock={handleLock}
+                    members={members}
+                    memberId={id}
+                    isAdmin={isAdmin}
+                    renderImages={memberResource.length > 0 ? resources[memberResource[0]].images : null}
+                    message={memberResource.length > 0 ? resources[memberResource[0]].message : null}
+                    key={memberResource}     // Re-render the Component everytime memberResource gets updated
+                />}
                 {isAdmin &&
                     <Accordion name="Requests">
                         {/* Requests */}

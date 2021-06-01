@@ -4,6 +4,7 @@ import { selectUser } from './authSlice';
 import {instance as axios} from "../api/axios"
 import endpoints from '../api/endpoints'
 import { selectProfile } from './profileSlice';
+import {updateMember} from './membersSlice'
 import {formatManyResources} from "../formatters/resourcesFormatter"
 
 export const fetchResource = createAsyncThunk(
@@ -102,6 +103,14 @@ export const uploadResource = createAsyncThunk(
             });
             if (response.status === 201){
                 const {resources} = formatManyResources([response.data])
+                
+                // Update the member
+                thunkAPI.dispatch(updateMember(
+                    {
+                        id: resources[0].memberId, 
+                        changes: {resourceId: resources[0].id}
+                    }
+                ))
                 return resources[0]
             }
             else{
