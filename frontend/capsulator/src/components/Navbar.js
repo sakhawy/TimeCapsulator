@@ -12,8 +12,8 @@ function NavbarItem({image, title, activeTab, changeActiveTab, link}){
         classname(
           "h-full lg:w-80 bg-gray-500 flex-grow flex items-center justify-center rounded-t-xl", 
           {
-            "text-secondary": activeTab !== link,
-            "text-primary bg-secondary": activeTab === link
+            "text-secondary": !(activeTab.includes(link)),
+            "text-primary bg-secondary": activeTab.includes(link)
         })
       }
       to={`${link}`}
@@ -27,6 +27,12 @@ function NavbarItem({image, title, activeTab, changeActiveTab, link}){
 }
 
 function Navbar({items}) {
+  /*
+  The Navbar will highlight items based on
+  - The link is in the current path (e.g. link: dashboard/, path dashboard/bingus/)
+  - The previous highlighted path (for non-navbar link)
+  - The final fallback: Dashboard's path
+  */
 
   // Choose which page is active right now
   const [activeTab, setActiveTab] = useState(null)
@@ -37,35 +43,49 @@ function Navbar({items}) {
   const location = useLocation()
 
   useEffect(() => {
-    setActiveTab(location.pathname)
-  }, [location.pathname])
+    // Set the active tab if the current url is in the item's list of links (preserve previous state)
+    if (items.filter(item => isAuthorized(item) && location.pathname.includes(item.link)).length > 0){
+      setActiveTab(location.pathname)
+    }
+    else {
+      // Fallback to 'Dashboard'
+      setActiveTab('/dashboard')
+    }
+    }, [location.pathname])
 
-  function changeActiveTab(tab){
-    setActiveTab(tab)
+  function isAuthorized(item){
+    // Check if the tab can appear on the current user's auth state (some tabs are disabled for authed users others appears for both auth and unauth)
+    //      A+B                                                         AB + A'B' 
+    if (item.authState === 2 || (user.access_token && item.authState === 1 || !user.access_token && item.authState === 0)){
+      return true
+    }
+    return false
+  }
+
+  function changeActiveTab(link){
+    // preserve previous state
+    if (activeTab.includes(link)){
+      setActiveTab(link)
+    }
   }
   
   return (
     <nav className="h-full">
         <div className="flex overflow-hidden h-full relative">
           
-          {/* Create items programatically */}
-          {items.map(item => {
-            if (
-              item.authState === 2 || // item is displayed for both authed and unauthed
-              (
-                user.access_token && item.authState === 1 ||  // item is only displayed for authed
-                !user.access_token && item.authState === 0  // item is only displayed for unauthed
-              )
-            )
-              return <NavbarItem
-                image={item.image}
-                title={item.title}
-                activeTab={activeTab}
-                changeActiveTab={changeActiveTab}
-                link={item.link}
-                key={items.indexOf(item)}
-              />
-          })}
+          {activeTab &&
+            items.map(item => {
+              if (isAuthorized(item))
+                  return <NavbarItem
+                  image={item.image}
+                  title={item.title}
+                  activeTab={activeTab}
+                  changeActiveTab={changeActiveTab}
+                  link={item.link}
+                  key={items.indexOf(item)}
+                  />
+                })
+          }
 
         </div>
       </nav>
