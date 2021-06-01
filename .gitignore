@@ -7,7 +7,8 @@ backend/conf/conf/__pycache__/
 backend/conf/capsulator/__pycache__/
 backend/conf/capsulator/api/__pycache__/
 backend/conf/capsulator/migrations/
-capsu
+
+*.rdb
 
 frontend/capsulator/node_modules
 frontend/capsulator/.pnp

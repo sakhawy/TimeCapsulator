@@ -15,6 +15,9 @@ from django.conf import settings
 from google.oauth2 import id_token
 from google.auth.transport import requests 
 
+# Email
+from capsulator import tasks
+
 from capsulator import models, tokens
 
 @api_view(["POST"])
@@ -51,7 +54,6 @@ def authenticate(request):
     token_serializer = serializers.TokenSerializer(token)
     return Response(token_serializer.data, status=status.HTTP_200_OK)
     
-
 class UserList(APIView):
     def post(self, request, format=None):
         user_serializer = serializers.UserSerializer(data=request.data)
@@ -241,7 +243,22 @@ class CapsuleDetail(APIView):
         )
 
         if capsule_serializer.is_valid():
-            capsule_serializer.save()
+            capsule = capsule_serializer.save()
+
+            # Create a task if the capsule is locked 
+            if capsule.state == models.Capsule.LOCKED:
+                user_id = request.user.id
+                capsule_id = capsule.id
+
+                # Async email sending when the unlocking_date comes 
+                tasks.unlock_capsule_task.apply_async(
+                    args=[
+                        user_id,
+                        capsule_id
+                    ],
+                    eta=capsule.unlocking_date
+                )
+
             return Response(capsule_serializer.data, status=status.HTTP_200_OK)
         
         return Response(capsule_serializer.errors, status=status.HTTP_404_NOT_FOUND)

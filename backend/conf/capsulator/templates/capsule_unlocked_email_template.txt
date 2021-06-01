@@ -1,0 +1,4 @@
+Hi, {{first_name|safe}}!
+
+Your Time Capsule, "{{capsule_name|safe}}", which was created at {{capsule_creation_date}} has just been unlocked!
+Prepare yourself for a journey to the past: {{capsule_url}}.
