@@ -20,7 +20,7 @@ import ViewCapsule from './components/ViewCapsule';
 function App() {
 
   const routes = {
-    LandingPage: "/",
+    LandingPage: "/home",
     AuthPage: "/auth",
     Dashboard: "/dashboard",
     Create: "/create",

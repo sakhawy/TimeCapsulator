@@ -57,7 +57,7 @@ export const authSlice = createSlice({
         },
         logout: (state) => {
             localStorage.removeItem("access_token")
-            window.location.reload()
+            window.location.href="/home"
         }
     },
     extraReducers: {
