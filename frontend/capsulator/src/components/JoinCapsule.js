@@ -13,12 +13,12 @@ function Join({handleJoin}){
     return (
         <div className="flex w-full justify-center items-center h-16">
             <input 
-                className={classname("outline-none p-2 text-primary text-sm font-bold md:text-bold md:text-xl flex flex-grow justify-center items-center rounded-l-2xl h-full w-5/6 border-primary border-2 rounder-l-2xl overflow-hidden bg-secondary", {"outline-primary": emptySubmission && !key})}
+                className={classname("outline-none p-2 text-primary text-sm font-bold md:text-bold md:text-xl flex flex-grow justify-center items-center rounded-l-2xl h-full w-9/12 border-primary border-2 rounder-l-2xl overflow-hidden bg-secondary", {"outline-primary": emptySubmission && !key})}
                 onChange={(e) => {setKey(e.target.value)}}
             />
 
             <button 
-                className="bg-primary text-secondary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-1/6 h-full rounded-r-2xl" 
+                className="bg-primary text-secondary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-3/12 h-full rounded-r-2xl" 
                 onClick={() => {
                     if (!key){
                         setEmptySubmission(1)

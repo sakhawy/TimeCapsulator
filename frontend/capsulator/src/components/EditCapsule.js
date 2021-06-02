@@ -627,7 +627,10 @@ function EditCapsule() {
     return (
         <div className="bg-secondary relative overflow-hidden rounded-b-2xl">
             {/* Dummy Flex */}
-            <div className="flex flex-col justify-center items-center p-4">
+            <div className="flex flex-col justify-center items-center p-4 space-y-3">
+                <div className="flex justify-center items-center felx-grow w-full">    
+                    <h1 className="text-2xl font-bold md:text-3xl md:font-extrabold text-primary text-center truncate">{memberCapsule.length > 0 && capsules[memberCapsule[0]].name}</h1>
+                </div>
                 {resourcesStatus === 'pending' && <Loading />}
                 {membersIds.length > 0 && <Edit 
                     handleSubmit={handleSubmit}

@@ -142,22 +142,22 @@ function Create() {
                     </div>
                     {/* Choose Name */}
                     <div className="flex justify-center items-center felx-grow h-16">
-                        <div className="text-primary text-sm font-bold md:text-bold md:text-xl flex flex-grow justify-center items-center rounded-l-2xl h-full w-2/6 border-primary border-2 rounder-l-2xl">
+                        <div className="text-primary text-sm font-bold md:text-bold md:text-xl flex flex-grow justify-center items-center rounded-l-2xl h-full w-3/12 border-primary border-2 rounder-l-2xl">
                             <p className="text-center">Name</p>
                         </div>
                         <input 
-                            className="bg-primary text-secondary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-4/6 h-full rounded-r-2xl" 
+                            className="bg-primary text-secondary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-9/12 h-full rounded-r-2xl pl-2" 
                             type="text"
                             onChange={handleNameChange}
                             />
                     </div>
                     {/* Choose unlock date */}
                     <div className="flex justify-center items-center felx-grow h-16">
-                        <div className="text-primary text-sm font-bold md:text-bold md:text-xl flex flex-grow justify-center items-center rounded-l-2xl h-full w-2/6 border-primary border-2 rounder-l-2xl">
+                        <div className="text-primary text-sm font-bold md:text-bold md:text-xl flex flex-grow justify-center items-center rounded-l-2xl h-full w-3/12 border-primary border-2 rounder-l-2xl">
                             <p className="text-center">Unlock Date</p>
                         </div>
                         <input 
-                            className="bg-primary text-secondary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-4/6 h-full rounded-r-2xl" 
+                            className="bg-primary text-secondary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-9/12 h-full rounded-r-2xl pl-2" 
                             type="date"
                             value={unlockingDate}
                             onChange={handleDateChange}

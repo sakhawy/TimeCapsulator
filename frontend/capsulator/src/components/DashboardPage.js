@@ -21,8 +21,8 @@ function CapsuleDetailsModal({name, creationDate, unlockDate, creators, toggleMo
                     </div>
                 </div>
                 {/* Name */}
-                <div className="flex-grow h-1/12 flex justify-center items-center">
-                    <p  className="text-secondary text-md font-extrabold md:text-2xl">{name}</p>
+                <div className="flex-grow h-1/12 flex justify-center items-center w-full">
+                    <p  className="text-secondary text-md font-extrabold md:text-2xl text-center w-72 truncate">{name}</p>
                 </div>
                 {/* Content */}
                 <div className="flex-grow h-7/12 flex flex-col justify-center items-center">
@@ -76,16 +76,16 @@ function Capsule({capsule, countdown, toggleModal, handleLock, handleUnlock}) {
     return(
         <div className="flex justify-center items-center h-16 bg-primary rounded-2xl overflow-hide">
             {/* Logo */}
-            <div className="h-full w-3/12 flex-grow flex items-center justify-center bg-secondary rounded-l-2xl border-2 border-primary">
+            {/* <div className="h-full w-3/12 flex-grow flex items-center justify-center bg-secondary rounded-l-2xl border-2 border-primary">
                 <div className="h-full flex items-center justify-center" >
                     <img src="logo.png"/>
                 </div>
-            </div>
+            </div> */}
             {/* Title + Countdown */}
-            <div className="flex flex-col flex-grow w-6/12 cursor-pointer" onClick={toggleModal}>
+            <div className="flex flex-col flex-grow w-9/12 cursor-pointer" onClick={toggleModal}>
                 {/* Title */}
-                <div className="flex-grow flex justify-center items-center">
-                    <p  className="text-secondary text-md font-extrabold md:text-2xl text-center">{capsule.name}</p>
+                <div className="flex-grow flex justify-center items-center pr-4 pl-4">
+                    <p  className="text-secondary text-md font-extrabold md:text-2xl text-center truncate">{capsule.name}</p>
                 </div>
                 {/* Countdown */}
                 <div className="flex-grow flex justify-center items-center">
@@ -206,7 +206,7 @@ function Dashboard() {
 
     return (
         // dummy div for modal
-        <div className="h-full w-full"> 
+        <div className="w-full h-full"> 
             {modalIsActive && modalCapsuleId !== null &&
                 <CapsuleDetailsModal 
                     toggleModal={() => toggleModal(!modalIsActive)}
