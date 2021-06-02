@@ -250,12 +250,13 @@ class CapsuleDetail(APIView):
             if capsule.state == models.Capsule.LOCKED:
                 user_id = request.user.id
                 capsule_id = capsule.id
-
+                capsule_url = request.get_host() + "/view/" + capsule.key + '/'
                 # Async email sending when the unlocking_date comes 
                 tasks.unlock_capsule_task.apply_async(
                     args=[
                         user_id,
-                        capsule_id
+                        capsule_id,
+                        capsule_url
                     ],
                     eta=capsule.unlocking_date
                 )

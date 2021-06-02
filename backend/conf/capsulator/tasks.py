@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from celery.decorators import task
 from celery.utils.log import get_task_logger
 
@@ -7,7 +9,7 @@ from .emails import send_capsule_unlocked_email
 logger = get_task_logger(__name__)
 
 @task(name="send_capsule_unlocked_email_task")
-def unlock_capsule_task(user_id, capsule_id):
+def unlock_capsule_task(user_id, capsule_id, capsule_url):
     "This task is dedicated to unlocking the capsule and notifying the user about it."
     
     capsule = Capsule.objects.get(id=capsule_id)
@@ -23,7 +25,6 @@ def unlock_capsule_task(user_id, capsule_id):
     email = user.email
     capsule_name = capsule.name
     capsule_creation_date = capsule.creation_date
-    capsule_url = "Add url later"
     send_capsule_unlocked_email(first_name, email, capsule_name, capsule_creation_date, capsule_url)
     logger.info(f"An Email to user '{email}' was sent.")
     

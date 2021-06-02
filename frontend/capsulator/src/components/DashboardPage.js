@@ -168,8 +168,7 @@ function Dashboard() {
     
     function handleUnlock(capsule){
         if (capsule){
-            const memberId = getMemberId(capsule.members)
-            history.push(`/view/${memberId}`)
+            history.push(`/view/${capsule.key}`)
         }
     }
 

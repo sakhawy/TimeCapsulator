@@ -137,7 +137,7 @@ function App() {
                 <ProtectedRoute path={`${routes.Logout}`} component={Logout} redirection={`${routes.AuthPage}`}/>
                 <ProtectedRoute path={`${routes.Create}`} component={Create} redirection={`${routes.AuthPage}`}/>
                 <ProtectedRoute path={`${routes.Edit}/:id`} component={EditCapsule} redirection={`${routes.AuthPage}`}/>
-                <ProtectedRoute path={`${routes.View}/:id`} component={ViewCapsule} redirection={`${routes.AuthPage}`}/>
+                <ProtectedRoute path={`${routes.View}/:key`} component={ViewCapsule} redirection={`${routes.AuthPage}`}/>
                 <ProtectedRoute path={`${routes.Join}`} component={JoinCapsule} redirection={`${routes.AuthPage}`}/>
               </Switch>
           </div>

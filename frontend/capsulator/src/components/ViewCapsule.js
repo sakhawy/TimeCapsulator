@@ -10,7 +10,7 @@ import { fetchCapsuleResources, selectResources, selectResourcesIds, selectResou
 import {OtherMembers} from './EditCapsule'
 
 function ViewCapsule() {
-    const {id} = useParams()
+    const {key} = useParams()
 
     const members = useSelector(selectMembers)
     const membersIds = useSelector(selectMembersIds)
@@ -26,7 +26,7 @@ function ViewCapsule() {
 
     const profile = useSelector(selectProfile)
 
-    const memberCapsule = capsulesIds.filter(capsule => capsules[capsule].members.includes(parseInt(id)))
+    const memberCapsule = capsulesIds.filter(capsule => capsules[capsule].key === key)
     const capsuleMembers = membersIds.filter(member => members[member].capsuleId === parseInt(memberCapsule[0]))
     const capsuleResources = resourcesIds.filter(resource => resources[resource])
 

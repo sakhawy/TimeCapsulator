@@ -37,7 +37,8 @@ export const joinCapsule = createAsyncThunk(
                     }))
                 }
 
-                return response.data
+                const members = formatManyMembers([response.data])
+                return members[0]
             }
             else
                 return thunkAPI.rejectWithValue(response.data)
