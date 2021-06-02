@@ -69,6 +69,7 @@ function Create() {
     const [publicButton, setPublicButton] = useState(0)
     const [name, setName] = useState("")
     const [unlockingDate, setUnlockingDate] = useState("")
+    const [emptySubmission, setEmptySubmission] = useState(false)
     const [validUnlockingDate, setValidUnlockingDate] = useState(true)
     
     const [created, setCreated] = useState(0)
@@ -113,8 +114,12 @@ function Create() {
         if (name && unlockingDate && profile){
             dispatch(createCapsule({name: name, unlockingDate: unlockingDate, member: profile.id, public: publicButton}))
             setCreated(1)
+            setEmptySubmission(false)
             return true
         }   
+        else {
+            setEmptySubmission(true)
+        }
     }
 
     function handleNameChange(e){
@@ -146,7 +151,13 @@ function Create() {
                             <p className="text-center">Name</p>
                         </div>
                         <input 
-                            className="bg-primary text-secondary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-9/12 h-full rounded-r-2xl pl-2" 
+                            className={classname(
+                                "bg-primary text-secondary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-9/12 h-full rounded-r-2xl pl-2", 
+                                {
+                                "outline-primary": emptySubmission && !name
+                                }
+                            )}
+                            
                             type="text"
                             onChange={handleNameChange}
                             />
@@ -157,7 +168,12 @@ function Create() {
                             <p className="text-center">Unlock Date</p>
                         </div>
                         <input 
-                            className="bg-primary text-secondary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-9/12 h-full rounded-r-2xl pl-2" 
+                            className={classname(
+                                "bg-primary text-secondary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-9/12 h-full rounded-r-2xl pl-2", 
+                                {
+                                "outline-primary": emptySubmission && !unlockingDate
+                                }
+                            )}
                             type="date"
                             value={unlockingDate}
                             onChange={handleDateChange}
