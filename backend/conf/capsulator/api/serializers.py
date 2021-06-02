@@ -4,6 +4,8 @@ from rest_framework import permissions
 
 from capsulator import models, tokens
 
+from datetime import datetime
+
 # class IsCapsuleAdmin(permissions.BasePermission):
 #     def has_permission(self, request, view):
 #         try:
@@ -156,6 +158,11 @@ class CapsuleSerializer(serializers.ModelSerializer):
         # Check if the capsule is being locked while some members aren't ready
         if value == models.Capsule.LOCKED and self.instance.members.all().filter(status=models.Member.NOT_READY):
             raise serializers.ValidationError("Cannot lock the capusle while some members aren't ready.")
+        return value
+
+    def validate_unlocking_date(self, value):
+        if (value.replace(tzinfo=None) - datetime.now().replace(tzinfo=None)).days < 30:
+            raise serializers.ValidationError("Unlocking Date's minimum value is 30 days!") 
         return value
 
 class FileSerializer(serializers.ModelSerializer):

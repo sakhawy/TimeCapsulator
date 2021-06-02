@@ -18,9 +18,9 @@ function CreationVerificationModal({capsuleURL, capsuleMember}) {
     }
 
     return (
-        <div className="fixed inset-0 z-10 flex justify-center items-center bg-primary bg-opacity-70 m-4">
+        <div className="fixed inset-0 z-10 flex justify-center items-center bg-primary bg-opacity-70 p-4">
             {/* The Modal */}
-            <div className="text-secondary bg-primary w-128 h-80 rounded-2xl p-6 flex flex-col shadow-xl border-seondary border-2 space-y-2"> 
+            <div className="text-secondary bg-primary w-128 h-72 rounded-2xl p-6 flex flex-col shadow-xl border-seondary border-2 space-y-2"> 
                 {/* Success Message */}
                 <div className="flex justify-center items-center felx-grow">    
                 {/* Add icon here */}
@@ -31,14 +31,14 @@ function CreationVerificationModal({capsuleURL, capsuleMember}) {
                 </div>
                 {/* Share Link */}
                 <div className="flex justify-center items-center flex-grow ">
-                    <div className="text-secondary text-sm font-bold md:text-bold md:text-xl flex flex-grow justify-center items-center rounded-l-2xl h-full w-5/6 border-secondary border-2 rounder-l-2xl overflow-hidden">
+                    <div className="text-secondary text-sm font-bold md:text-bold md:text-xl flex flex-grow justify-center items-center rounded-l-2xl h-16 w-5/6 border-secondary border-2 rounder-l-2xl overflow-hidden">
                         <div className="overflow-x-auto h-full flex items-center justify-center">
 
                             <p className="w-full whitespace-pre select-all">{capsuleURL}</p>
                         </div>
                     </div>
                     <button 
-                        className="bg-secondary text-primary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-1/6 h-full rounded-r-2xl" 
+                        className="bg-secondary text-primary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-1/6 h-16 rounded-r-2xl" 
                         type="text"
                         onClick={() => {navigator.clipboard.writeText(capsuleURL); setCopied("Done!");}}
                     >
@@ -52,7 +52,7 @@ function CreationVerificationModal({capsuleURL, capsuleMember}) {
                 {/* Redirection button */}
                 <div className="flex justify-center items-center flex-grow">
                     <button 
-                        className="bg-secondary text-primary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-full h-full rounded-2xl " 
+                        className="bg-secondary text-primary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-full h-16 rounded-2xl " 
                         type="text"
                         onClick={handleRedirect}
                     >
@@ -127,7 +127,8 @@ function Create() {
     }
 
     function handleDateChange(e){
-        if (+Date.parse(e.target.value) > +Date.now() + 1000*60*60*24){
+        // Minimum of 30 days
+        if (+Date.parse(e.target.value) > +Date.now() + 1000*60*60*24*30){
             setUnlockingDate(e.target.value)
         } 
         // else {
@@ -178,6 +179,9 @@ function Create() {
                             value={unlockingDate}
                             onChange={handleDateChange}
                             />
+                    </div>
+                    <div className="flex-grow flex justify-center items-center">
+                        <p className="text-primary text-xs font-semibold md:text-bold md:text-xl text-center">* Minimum value is 30 days from now!</p>
                     </div>
                     {/* Choose share & make public */}
                     <div className="flex justify-center items-start felx-grow flex-col space-y-2">
