@@ -18,7 +18,7 @@ function CreationVerificationModal({capsuleURL, capsuleMember}) {
     }
 
     return (
-        <div className="fixed inset-0 flex justify-center items-center bg-primary bg-opacity-70 m-4">
+        <div className="fixed inset-0 z-10 flex justify-center items-center bg-primary bg-opacity-70 m-4">
             {/* The Modal */}
             <div className="text-secondary bg-primary w-128 h-80 rounded-2xl p-6 flex flex-col shadow-xl border-seondary border-2 space-y-2"> 
                 {/* Success Message */}
@@ -90,7 +90,7 @@ function Create() {
                 
                 // When the admin member successfully joins the created capsule
                 if (createdCapsule.members.length){
-                    const capsuleURL = `http://localhost:8000/${createdCapsule.key}`;
+                    const capsuleURL = `${createdCapsule.key}`;
                     setModalCapsule({capsuleURL: capsuleURL, capsuleMember: createdCapsule.members[0]})
                 }
 

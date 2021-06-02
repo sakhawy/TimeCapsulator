@@ -84,7 +84,7 @@ function Accordion(props){
                     </div>
                 </div>
             </div>
-            <div>
+            <div className="w-full h-full">
                 {collapse === false && props.children}
             </div>
         </div>
@@ -217,15 +217,60 @@ export function OtherMembers(props){
     )
 }
 
+function LockVerificationModal(props) {
+    const [copied, setCopied] = useState("Copy")
+    const history = useHistory()
+
+    function handleRedirect(){
+        // history.push(`/edit/${capsuleMember}`)
+    }
+
+    return (
+        <div className="fixed inset-0 z-10 flex justify-center items-center bg-primary bg-opacity-70">
+            {/* The Modal */}
+            <div className="text-secondary bg-primary w-128 h-64 rounded-2xl p-6 flex flex-col shadow-xl border-seondary border-2 space-y-2"> 
+                {/* Success Message */}
+                <div className="flex justify-center items-center felx-grow">    
+                {/* Add icon here */}
+                    <h1 className="text-2xl font-bold md:text-3xl md:font-extrabold text-secondary text-center">{props.header}</h1>
+                </div>
+                {/* Body */}
+                <div className="flex justify-center items-center flex-grow ">
+                    <p className="text-center font-semibold">
+                        {props.body}
+                    </p>
+                </div>
+
+                {/* Buttons */}
+                <div className="h-16 flex justify-center items-center space-x-2">
+                    {props.buttons.map(button => {
+                        return(
+                            <button 
+                                className="bg-secondary text-primary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-full h-16 rounded-2xl " 
+                                type="text"
+                                key={button}
+                                onClick={props.buttonsFunctions[button]}
+                            >
+                                {button}
+                            </button>
+                        )
+                    })}
+                </div>
+            </div>
+        </div>
+    )
+}
+
 function Edit(props){
     const [emptySubmission, setEmptySubmission] = useState(false)
     const [message, setMessage] = useState(props.message)
     const [renderImages, setRenderImages] = useState(props.renderImages)
     const [uploadImages, setUploadImages] = useState([])
-    const [toggleModal, setToggleModal] = useState(false)
+    const [toggleImagesModal, setToggleImagesModal] = useState(false)
+    const [toggleVerificationModal, setToggleVerificationModal] = useState(false)
     const [modalInitImage, setModalInitImage] = useState(0) // Index into renderImages
     const [disableSubmit, setDisableSubmit] = useState(0)
-    const [disableReady, setDisableReady] = useState(0)
+    const [disableReady, setDisableReady] = useState(1)
     const [disableLock, setDisableLock] = useState(1)
 
     useEffect(() => {
@@ -277,13 +322,58 @@ function Edit(props){
         }
     }
 
-    function handleToggleModal(){
-        setToggleModal(!toggleModal)
+    function handleToggleImagesModal(){
+        setToggleImagesModal(!toggleImagesModal)
+    }
+
+    function handleToggleVerificationModal(){
+        setToggleVerificationModal(!toggleVerificationModal)
+    }
+
+    const history = useHistory()
+    function handleVerificationModalDashboard(){
+        history.push("/dashboard")
+    }
+
+    function handleRenderImageClick(image){
+        setToggleImagesModal(1)
+        setModalInitImage(renderImages.indexOf(image))
+    }
+
+    function allReady(){
+        // For the LockVerificationModal
+        const notReady = props.capsuleMembers.filter(member => props.members[member].status === "N")
+        return notReady.length === 0
     }
 
     return (
         <div className="w-full h-full">
-            {toggleModal === 1 && <ImageModal images={renderImages} image={modalInitImage} toggleModal={handleToggleModal}/>}
+            
+            {allReady() && toggleVerificationModal && <LockVerificationModal 
+                    header="Are you sure?"
+                    body="You won't be able to edit or view the Capsule until it is unlocked!"
+                    buttons={["Confirm", "Close"]}
+                    buttonsFunctions={{
+                        "Close": handleToggleVerificationModal,
+                        "Confirm": props.handleLock,
+                    }}
+                />}
+            {allReady() && toggleVerificationModal && props.capsule.state === 1 && <LockVerificationModal 
+                    header="Done!"
+                    body="The capsule has successfully been unlocked!"
+                    buttons={["Dashboard"]}
+                    buttonsFunctions={{
+                        "Dashboard": handleVerificationModalDashboard,
+                    }}
+                />}
+            {!allReady() && toggleVerificationModal && <LockVerificationModal 
+                header="Cannot lock the Capsule."
+                body="Some members are still not ready!"
+                buttons={["Close"]}
+                buttonsFunctions={{"Close": handleToggleVerificationModal}}
+            />}
+
+            {toggleImagesModal === 1 && <ImageModal images={renderImages} image={modalInitImage} toggleImagesModal={handleToggleImagesModal}/>}
             <div className="flex flex-col flex-grow justify-center items-center w-full space-y-2">
                 {/* Message */}
                 <div className="w-full flex flex-grow flex-col justify-center items-center">
@@ -348,7 +438,7 @@ function Edit(props){
                                 <div 
                                     className="flex md:h-44 md:w-44 w-24 h-24 bg-secondary m-1 p-1 rounded-xl cursor-pointer" 
                                     key={renderImages.indexOf(image)}
-                                    onClick={() => { setToggleModal(1); setModalInitImage(renderImages.indexOf(image))}}    
+                                    onClick={() => handleRenderImageClick(image)}    
                                 >
                                     <img src={image} className="rounded-xl object-cover"/>
                                 </div>
@@ -420,7 +510,11 @@ function Edit(props){
                                     {"opacity-50 cursor-not-allowed": disableLock}
                                 )
                             }
-                            onClick={(e) => {!disableLock && props.handleLock(e)}}
+                            onClick={(e) => {
+                                if (!disableLock){
+                                    setToggleVerificationModal(true)
+                                }
+                            }}
                             >
                                 <div className="h-full w-full flex items-center justify-center space-x-2">
                                     <FontAwesomeIcon icon={faLock} />
@@ -532,6 +626,8 @@ function EditCapsule() {
                     handleReady={handleReady}
                     handleLock={handleLock}
                     members={members}
+                    capsuleMembers={capsuleMembers}
+                    capsule={capsules[memberCapsule[0]]}
                     memberId={id}
                     isAdmin={isAdmin}
                     renderImages={memberResource.length > 0 ? resources[memberResource[0]].images : null}
@@ -548,10 +644,10 @@ function EditCapsule() {
                         />
                         {requestingMembers.length === 0 &&
                         <div className="h-full w-full flex items-center justify-center space-x-2 text-lg text-primary">
-                            <FontAwesomeIcon icon={faExclamation} />
                             <p className="font-bold">
                                 None
                             </p>
+                            <FontAwesomeIcon icon={faExclamation} />
                         </div>
                         }
                     </Accordion>
@@ -560,12 +656,12 @@ function EditCapsule() {
                 <Accordion name="Other Members">
                     {capsuleMembers.length > 0 && capsuleResources.length > 0 && <OtherMembers members={capsuleMembers.map(member => members[member]).filter(member => member.userId !== profile.id)} resources={capsuleResources.map(resource => resources[resource])}/>}
                 
-                    {capsuleResources.length === 1 && capsuleMembers.length === 1 && 
+                    {capsuleResources.length <= 1 && capsuleMembers.length <= 1 && 
                     <div className="h-full w-full flex items-center justify-center space-x-2 text-lg text-primary">
-                        <FontAwesomeIcon icon={faExclamation} />
                         <p className="font-bold">
                             None
                         </p>
+                        <FontAwesomeIcon icon={faExclamation} />
                     </div>
                     }
                 </Accordion>
