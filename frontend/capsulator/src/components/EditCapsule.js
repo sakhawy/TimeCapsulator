@@ -368,7 +368,7 @@ function Edit(props){
                 />}
             {allReady() && toggleVerificationModal && props.capsule.state === 1 && <LockVerificationModal 
                     header="Done!"
-                    body="The capsule has successfully been unlocked!"
+                    body="The capsule has successfully been locked! You'll be sent an Email once it's unlocked."
                     buttons={["Dashboard"]}
                     buttonsFunctions={{
                         "Dashboard": handleVerificationModalDashboard,

@@ -56,7 +56,7 @@ export const createCapsule = createAsyncThunk(
                 },
                 data: {
                     name: data.name,
-                    unlocking_date: `${data.unlockingDate}T09:46`,  // Reformat
+                    unlocking_date: `${data.unlockingDate}T00:00`,  // Reformat
                     member: data.member,
                     is_public: data.public
                 }

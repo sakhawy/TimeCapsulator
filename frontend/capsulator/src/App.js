@@ -64,9 +64,10 @@ function App() {
   // This shall be the MainLoader
   if (authStatus === 'pending'){
     return (
-      <div>
-        {/* Style later */}
-        LOADING :)
+      <div className="font-mono min-h-screen flex items-center justify-center bg-primary text-secondary">
+        <p>
+          Loading...
+        </p>
       </div>
     )
   }

@@ -11,7 +11,7 @@ import { faEdit, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons'
 
 function CapsuleDetailsModal({name, creationDate, unlockDate, creators, toggleModal}) {
     return (
-        <div className="fixed inset-0 flex justify-center items-center bg-primary bg-opacity-70">
+        <div className="fixed inset-0 z-10 flex justify-center items-center bg-primary bg-opacity-70">
             {/* The Modal */}
             <div className="text-secondary bg-primary w-128 h-128 rounded-2xl p-6 flex flex-col shadow-xl border-seondary border-2 m-4"> 
                 {/* Logo */}
@@ -77,8 +77,8 @@ function Capsule({capsule, countdown, toggleModal, handleLock, handleUnlock}) {
         <div className="flex justify-center items-center h-16 bg-primary rounded-2xl overflow-hide">
             {/* Logo */}
             <div className="h-full w-3/12 flex-grow flex items-center justify-center bg-secondary rounded-l-2xl border-2 border-primary">
-                <div className="h-full" >
-                    <img src="logo.png" className="h-full"/>
+                <div className="h-full flex items-center justify-center" >
+                    <img src="logo.png"/>
                 </div>
             </div>
             {/* Title + Countdown */}
@@ -116,7 +116,7 @@ function Capsule({capsule, countdown, toggleModal, handleLock, handleUnlock}) {
                     </div>}
                     {capsule.state === 2 && 
                     <div className="h-full w-full flex flex-col items-center justify-center space-x-1">
-                        <FontAwesomeIcon icon={faLockOpen} />
+                        <FontAwesomeIcon icon={faLockOpen} className={classname({"animate-bounce": capsule.state === 2})}/>
                         <p>Unlock</p>
                     </div>}
                 </button>
@@ -179,6 +179,11 @@ function Dashboard() {
             const unlockingDate = +Date.parse(capsules[capsulesIds[i]].unlockingDate)
             const delta = unlockingDate - +Date.now()
             
+            if (delta <= 0){
+                timerObject[capsulesIds[i]] = "00D 00:00:00"
+                continue
+            }
+
             const formatted = {
                 days: Math.floor(delta / (1000 * 60 * 60 * 24)).toString().padStart(2, "0"),
                 hours: Math.floor((delta / (1000 * 60 * 60)) % 24).toString().padStart(2, "0"),
@@ -201,33 +206,32 @@ function Dashboard() {
 
     return (
         // dummy div for modal
-        <div> 
+        <div className="h-full w-full"> 
             {modalIsActive && modalCapsuleId !== null &&
                 <CapsuleDetailsModal 
                     toggleModal={() => toggleModal(!modalIsActive)}
                     name={capsules[modalCapsuleId].name}
                     creationDate={capsules[modalCapsuleId].creationDate}    
                     unlockDate={capsules[modalCapsuleId].unlockingDate}
-                    creators={capsules[modalCapsuleId].members.map(id => members[id].user_name)}    
+                    creators={capsules[modalCapsuleId].members.map(id => members[id].userName)}    
                 />}
-            <div className="bg-secondary min-h-128 rounded-b-2xl p-6 space-y-2">
-                {
-                    capsulesStatus === 'pending' && !capsules &&
-                        
-                        <p>Loading</p>
+            <div className="bg-secondary rounded-b-2xl p-4 space-y-2">
+                <div className="flex justify-center items-center felx-grow">    
+                    <h1 className="text-2xl font-bold md:text-3xl md:font-extrabold text-primary text-center">All Time Capsules</h1>
+                </div>
+                {capsulesStatus === 'pending' && !capsules &&
+                    <p>Loading</p>
                 }
-                {
-                    capsules &&
-                        capsulesIds.map(capsule => {
-                            return (
-                                <Capsule 
-                                    key={capsules[capsule].id} 
-                                    capsule={capsules[capsule]} 
-                                    handleLock={handleLock}
-                                    handleUnlock={handleUnlock}
-                                    countdown={time[capsule]} toggleModal={() => toggleModal(!modalIsActive, capsules[capsule].id)
-                                }/>
-                        )})
+                {capsules && capsulesIds.map(capsule => {
+                    return (
+                        <Capsule 
+                            key={capsules[capsule].id} 
+                            capsule={capsules[capsule]} 
+                            handleLock={handleLock}
+                            handleUnlock={handleUnlock}
+                            countdown={time[capsule]} toggleModal={() => toggleModal(!modalIsActive, capsules[capsule].id)
+                        }/>
+                )})
                 }
             </div>
         </div>

@@ -36,18 +36,18 @@ function AuthPage() {
     }
 
     return (
-        <div className="flex flex-col bg-secondary items-center justify-center h-64 sm:min-h-0 rounded-b-2xl p-4">
+        <div className="flex flex-col space-y-2 bg-secondary items-center justify-center sm:min-h-0 rounded-b-2xl p-4">
             <div className="flex-grow flex justify-center items-center">    
                 <h1 className="text-2xl font-bold md:text-3xl md:font-extrabold text-primary ">Sign Up - Login</h1>
             </div>
-            <div className="flex-grow w-full">
+            <div className="flex-grow w-full h-16">
                 <GoogleLogin 
                     clientId="354605905259-6ip0oar2l4prc4pg7fbktcu0771ibqm5.apps.googleusercontent.com"
                     render={props => (
                         <button 
                             onClick={props.onClick} 
                             disabled={props.disabled} 
-                            className="rounded-md bg-primary text-secondary min-w-full min-h-full font-bold text-2xl"
+                            className="rounded-md bg-primary text-secondary min-w-full min-h-full font-bold text-2xl h-16"
                         >
                             <div className="h-full w-full flex items-center justify-center space-x-2">
                                 <p>
