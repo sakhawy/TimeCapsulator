@@ -6,6 +6,8 @@ import {selectCapsules, selectCapsulesIds, selectCapsulesStatus} from '../store/
 import { selectMembers, selectMembersIds } from '../store/membersSlice'
 import { Link, useHistory } from 'react-router-dom'
 import { selectProfile } from '../store/profileSlice'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEdit, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons'
 
 function CapsuleDetailsModal({name, creationDate, unlockDate, creators, toggleModal}) {
     return (
@@ -93,13 +95,30 @@ function Capsule({capsule, countdown, toggleModal, handleLock, handleUnlock}) {
             {/* Lock/Unlock button */}
             <div className="flex-grow flex justify-center items-center h-full w-3/12 bg-secondary rounded-r-2xl border-2 border-primary">
                 <button 
-                    id={capsule.id}
                     className={classname("text-primary text-xs font-semibold md:text-bold md:text-xl w-full h-full outline-none", {"opacity-50 cursor-not-allowed": capsule.state === 1})}
-                    onClick={(e) => capsule.state === 0 && handleLock(e) || capsule.state === 2 && handleUnlock(e)}
+                    onClick={() => {
+                        if (capsule.state === 0) {
+                            handleLock(capsule)
+                        } else if (capsule.state === 2) {
+                            handleUnlock(capsule)}
+                            }
+                        }
                 >
-                    {capsule.state === 0 && "Lock"}
-                    {capsule.state === 1 && "Locked"}
-                    {capsule.state === 2 && "Unlock"}
+                    {capsule.state === 0 && 
+                    <div className="h-full w-full flex flex-col items-center justify-center space-x-1">
+                        <FontAwesomeIcon icon={faEdit} />
+                        <p>Edit</p>
+                    </div>}
+                    {capsule.state === 1 && 
+                    <div className="h-full w-full flex flex-col items-center justify-center space-x-1">
+                        <FontAwesomeIcon icon={faLock} />
+                        <p>Locked</p>
+                    </div>}
+                    {capsule.state === 2 && 
+                    <div className="h-full w-full flex flex-col items-center justify-center space-x-1">
+                        <FontAwesomeIcon icon={faLockOpen} />
+                        <p>Unlock</p>
+                    </div>}
                 </button>
             </div>
         </div>
@@ -110,7 +129,6 @@ function Dashboard() {
 
     const [modalIsActive, setModalIsActive] = useState(false)
     const [modalCapsuleId, setModalCapsuleId] = useState(null)
-    const [time, setTime] = useState(0)
 
     const dispatch = useDispatch()
     
@@ -126,6 +144,8 @@ function Dashboard() {
     const capsulesIds = useSelector(selectCapsulesIds)
     const capsulesStatus = useSelector(selectCapsulesStatus)
 
+    const [time, setTime] = useState(calculateTime())
+
     function toggleModal(isActive, id){
         setModalCapsuleId(id)
         setModalIsActive(isActive)
@@ -139,16 +159,14 @@ function Dashboard() {
         return memberId
     }
 
-    function handleLock(e){
-        const capsule = capsules[e.target.id]
+    function handleLock(capsule){
         if (capsule){
             const memberId = getMemberId(capsule.members)
             history.push(`/edit/${memberId}`)
         }
     }
     
-    function handleUnlock(e){
-        const capsule = capsules[e.target.id]
+    function handleUnlock(capsule){
         if (capsule){
             const memberId = getMemberId(capsule.members)
             history.push(`/view/${memberId}`)

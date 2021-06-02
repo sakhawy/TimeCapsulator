@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, Children } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useParams, useHistory, useLocation, useRouteMatch } from "react-router"
 import classname from 'classnames'
@@ -7,6 +7,8 @@ import { lockCapsule, selectCapsules, selectCapsulesIds, selectCapsulesStatus } 
 import { fetchCapsuleResources, fetchResource, fetchResources, selectResources, selectResourcesIds, selectResourcesStatus, updateResource, uploadResource } from "../store/resourcesSlice"
 import { selectMembers, selectMembersIds, selectMembersStatus, fetchCapsuleMembers, updateMemberState, updateMemberStatus } from "../store/membersSlice"
 import { selectProfile } from "../store/profileSlice"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faAngleDown, faAngleRight, faAngleUp, faCheck, faCheckDouble, faChevronLeft, faChevronRight, faCommentDots, faExclamation, faFile, faLock, faTimes } from "@fortawesome/free-solid-svg-icons"
 
 
 function Loading(){
@@ -28,7 +30,7 @@ function  ImageModal({images, image, toggleModal}){
     }
 
     return (
-        <div className="fixed inset-0 flex justify-center items-center bg-primary bg-opacity-70">
+        <div className="fixed inset-0 z-10 flex justify-center items-center bg-primary bg-opacity-70">
             {/* The Modal */}
             <div className="text-secondary bg-primary w-128 h-11/12 rounded-2xl p-6 flex flex-col shadow-xl border-seondary border-2 m-4">
                 <div className="flex flex-grow items-center justify-center h-11/12">
@@ -39,14 +41,22 @@ function  ImageModal({images, image, toggleModal}){
                         className={classname("bg-secondary text-primary h-full w-full rounded-l-2xl", {"opacity-50 cursor-not-allowed": currentImage === 0})}
                         onClick={() => handleChangeImage(-1)}
                     >
-                        Left
+                        <div className="h-full w-full flex items-center justify-center space-x-2 text-primary">
+                            <FontAwesomeIcon icon={faChevronLeft} />
+                        </div>
                     </button>
-                    <button className="bg-secondary text-primary h-full w-full " onClick={toggleModal}>Close</button>
+                    <button className="bg-secondary text-primary h-full w-full " onClick={toggleModal}>
+                        <div className="h-full w-full flex items-center justify-center space-x-2 text-primary">
+                            <FontAwesomeIcon icon={faTimes} />
+                        </div>
+                    </button>
                     <button 
                         className={classname("bg-secondary text-primary h-full w-full rounded-r-2xl", {"opacity-50 cursor-not-allowed": currentImage === images.length - 1})}
                         onClick={() => handleChangeImage(1)}
                     >
-                        Right
+                        <div className="h-full w-full flex items-center justify-center space-x-1 text-primary">
+                            <FontAwesomeIcon icon={faChevronRight} />
+                        </div>
                     </button>
                 </div>
                 
@@ -66,10 +76,17 @@ function Accordion(props){
                     className="text-primary font-bold text-lg md:font-extrabold md:text-xl outline-none cursor-pointer select-none"
                     onClick={() => setCollapse(!collapse)}
                 >
-                    {props.name}
+                    <div className="h-full w-full flex items-center justify-center space-x-2">
+                        <FontAwesomeIcon icon={collapse ? faAngleRight : faAngleUp} />
+                        <p>
+                            {props.name}
+                        </p>
+                    </div>
                 </div>
             </div>
-            {collapse === false && props.children}
+            <div>
+                {collapse === false && props.children}
+            </div>
         </div>
     )
 
@@ -272,7 +289,10 @@ function Edit(props){
                 <div className="w-full flex flex-grow flex-col justify-center items-center">
                     <div className="flex flex-grow justify-center items-center w-full h-1/12">
                         <div className="flex justify-center items-center w-2/6 bg-primary rounded-t-lg h-full p-2">
-                            <p className="text-secondary font-semibold md:font-bold md:text-xl">Message</p>
+                            <div className="h-full w-full flex items-center justify-center space-x-1 text-secondary">
+                                <FontAwesomeIcon icon={faCommentDots} />
+                                <p className="font-semibold md:font-bold md:text-xl">Message</p>
+                            </div>
                         </div>
                     </div>
                     <div 
@@ -298,7 +318,10 @@ function Edit(props){
                     {/* Title */}
                     <div className="flex flex-grow justify-center items-center w-full h-1/12">
                         <div className="flex justify-center items-center w-2/6 bg-primary rounded-t-lg h-full p-2">
-                            <p className="text-secondary font-semibold md:font-bold md:text-xl">Upload</p>
+                        <div className="h-full w-full flex items-center justify-center space-x-1 text-secondary">
+                                <FontAwesomeIcon icon={faFile} />
+                                <p className="font-semibold md:font-bold md:text-xl">Files</p>
+                            </div>
                         </div>
                     </div>
                     {/* Body */}
@@ -334,11 +357,11 @@ function Edit(props){
                     </div>
                 </div>
                 <div className="flex flex-grow h-16 w-full items-center justify-center">
-                    <div className="flex flex-row flex-grow justify-center items-center w-full h-full space-x-2">
+                    <div className="flex flex-row flex-grow justify-center items-center w-full h-full space-x-1">
                         <button 
                             className={
                                 classname(
-                                    "h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-2xl w-3/6",
+                                    "h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-lg md:text-2xl w-3/6",
                                     {"opacity-50 cursor-not-allowed": disableSubmit}
                                 )
                             }
@@ -355,32 +378,56 @@ function Edit(props){
                                 }
                             }
                         >
-                            Submit
+                            <div className="h-full w-full flex items-center justify-center space-x-2">
+                                <FontAwesomeIcon icon={faCheckDouble} />
+                                <p>
+                                    Submit
+                                </p>
+                            </div>
                         </button>
                         
                         <button 
                             className={
                                 classname(
-                                    "h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-2xl w-3/6",
+                                    "h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-lg md:text-2xl w-3/6",
                                     {"opacity-50 cursor-not-allowed": disableReady}
                                 )
                             }
                             onClick={(e) => {!disableReady && props.handleReady(e)}}
                         >
-                            {props.members[props.memberId] && props.members[props.memberId].status === "R" ? "Not-Ready" : "Ready"}
+                                {props.members[props.memberId] && props.members[props.memberId].status === "R" ?
+                                    <div className="h-full w-full flex items-center justify-center space-x-2">
+                                        <FontAwesomeIcon icon={faTimes} />
+                                        <p>
+                                            Ready
+                                        </p>
+                                    </div>
+                                    :
+                                    <div className="h-full w-full flex items-center justify-center space-x-2">
+                                        <FontAwesomeIcon icon={faCheck} />
+                                        <p>
+                                            Ready
+                                        </p>
+                                    </div>
+                                }
                         </button>
 
                         {props.isAdmin && 
                             <button 
                             className={
                                 classname(
-                                    "h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-2xl w-3/6",
+                                    "h-10 flex-grow rounded-md bg-primary text-secondary font-bold text-lg md:text-2xl w-3/6",
                                     {"opacity-50 cursor-not-allowed": disableLock}
                                 )
                             }
                             onClick={(e) => {!disableLock && props.handleLock(e)}}
                             >
-                                Lock
+                                <div className="h-full w-full flex items-center justify-center space-x-2">
+                                    <FontAwesomeIcon icon={faLock} />
+                                    <p>
+                                        Lock
+                                    </p>
+                                </div>
                             </button>
                         }
                         
@@ -499,11 +546,28 @@ function EditCapsule() {
                             handleRequestAction={handleRequestAction} 
                             loading={membersStatus === 'pending'}
                         />
+                        {requestingMembers.length === 0 &&
+                        <div className="h-full w-full flex items-center justify-center space-x-2 text-lg text-primary">
+                            <FontAwesomeIcon icon={faExclamation} />
+                            <p className="font-bold">
+                                None
+                            </p>
+                        </div>
+                        }
                     </Accordion>
                 }
                 {/* Other Members */}
                 <Accordion name="Other Members">
                     {capsuleMembers.length > 0 && capsuleResources.length > 0 && <OtherMembers members={capsuleMembers.map(member => members[member]).filter(member => member.userId !== profile.id)} resources={capsuleResources.map(resource => resources[resource])}/>}
+                
+                    {capsuleResources.length === 1 && capsuleMembers.length === 1 && 
+                    <div className="h-full w-full flex items-center justify-center space-x-2 text-lg text-primary">
+                        <FontAwesomeIcon icon={faExclamation} />
+                        <p className="font-bold">
+                            None
+                        </p>
+                    </div>
+                    }
                 </Accordion>
             </div>
         </div>

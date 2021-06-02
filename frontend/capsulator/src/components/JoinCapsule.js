@@ -3,6 +3,8 @@ import classname from 'classnames'
 import { joinCapsule, selectMembersError, selectMembersStatus, setMember } from "../store/membersSlice"
 import { useDispatch, useSelector } from "react-redux"
 import { useHistory } from "react-router"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faArrowLeft, faCheck, faRedo } from "@fortawesome/free-solid-svg-icons"
 
 function Join({handleJoin}){
     const [key, setKey] = useState("")
@@ -31,18 +33,22 @@ function Join({handleJoin}){
     )
 }
 
-function Feedback({message, buttonMessage, handleFeedbackOnClick}){
+function Feedback({message, buttonMessage, buttonIcon, handleFeedbackOnClick}){
     return (
         <div className="flex flex-col w-full justify-center items-center flex-grow">
             <div className="flex flex-grow items-center justify-center">
                 <p  className="text-primary text-md font-bold md:text-xl text-center">{message}</p>
             </div>
-            <div className="flex flex-grow items-end justify-start h-10 w-3/6">
+            <div className="flex flex-grow items-end justify-start w-3/6">
                 <button 
-                    className="bg-primary text-secondary text-md font-bold md:text-xl outline-none flex-grow w-full h-full rounded-2xl" 
+                    className="bg-primary text-secondary text-md font-bold md:text-xl outline-none flex-grow w-full h-16 rounded-2xl" 
                     onClick={handleFeedbackOnClick}
                 >
-                    {buttonMessage}
+                    <div className="h-full w-full flex items-center justify-center space-x-3">
+                        <FontAwesomeIcon icon={buttonIcon} />
+                        <p>{buttonMessage}</p>
+                    </div>
+                    
                 </button>
             </div>
         </div>
@@ -85,26 +91,31 @@ function JoinCapsule() {
             if (membersStatus === 'fulfilled'){
                 setFeedbackData({
                     message: "Request has been sent!",
-                    buttonMessage: "Back to Dashboard",
+                    buttonMessage: "Dashboard",
+                    buttonIcon: faArrowLeft
                 })
                 setToggleFeedback(1)
             } else if (membersStatus === 'rejected' && membersError){
-                if (parseInt(membersError.status) === 404){
-                    setFeedbackData({
-                        message: "Capsule is not found.",
-                        buttonMessage: "Retry"
-                    })
-                    setToggleFeedback(1)
-                }
+                // if (parseInt(membersError.status) === 404){
+                setFeedbackData({
+                    message: "Capsule is not found.",
+                    buttonMessage: "Retry",
+                    buttonIcon: faRedo
+                })
+                setToggleFeedback(1)
+                // }
             }
         }
         
     }, [membersStatus])
 
     return (
-        <div className="h-40 w-full bg-secondary flex flex-col justify-center items-center p-4 rounded-b-2xl">
+        <div className="w-full bg-secondary flex flex-col space-y-2 justify-center items-center p-4 rounded-b-2xl">
+            <div className="flex justify-center items-center felx-grow">    
+                <h1 className="text-2xl font-bold md:text-3xl md:font-extrabold text-primary">Join a Time Capsule</h1>
+            </div>
             {toggleFeedback === 0 && <Join handleJoin={handleJoin}/>}
-            {toggleFeedback === 1 && <Feedback message={feedbackData.message} buttonMessage={feedbackData.buttonMessage} handleFeedbackOnClick={handleFeedbackOnClick}/>}
+            {toggleFeedback === 1 && <Feedback message={feedbackData.message} buttonMessage={feedbackData.buttonMessage} buttonIcon={feedbackData.buttonIcon} handleFeedbackOnClick={handleFeedbackOnClick}/>}
         </div>
     )
 }

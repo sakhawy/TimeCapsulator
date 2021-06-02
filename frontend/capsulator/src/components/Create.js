@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from "react-redux"
 import { createCapsule, selectCapsules, selectCapsulesStatus, selectCapsulesIds } from "../store/capsulesSlice"
 import { fetchProfile, selectProfile } from "../store/profileSlice"
 import { useHistory } from "react-router"
+import { faCopy } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 
 function CreationVerificationModal({capsuleURL, capsuleMember}) {
@@ -38,8 +40,13 @@ function CreationVerificationModal({capsuleURL, capsuleMember}) {
                     <button 
                         className="bg-secondary text-primary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-1/6 h-full rounded-r-2xl" 
                         type="text"
-                        onClick={() => {navigator.clipboard.writeText(capsuleURL); setCopied("Copied!");}}
-                    >{copied}</button>
+                        onClick={() => {navigator.clipboard.writeText(capsuleURL); setCopied("Done!");}}
+                    >
+                        <div className="h-full w-full flex flex-col items-center justify-center space-x-1">
+                            <FontAwesomeIcon icon={faCopy} />
+                            <p>{copied}</p>
+                        </div>
+                    </button>
                 </div>
 
                 {/* Redirection button */}
@@ -127,7 +134,7 @@ function Create() {
     return (
         <div>
             { modalIsReady && <CreationVerificationModal capsuleURL={modalCapsule.capsuleURL} capsuleMember={modalCapsule.capsuleMember}/> }
-            <div className="bg-secondary h-128 rounded-b-2xl p-4 ">
+            <div className="bg-secondary rounded-b-2xl p-4 ">
                 <div className="flex flex-col space-y-2">
                     {/* Create Capsule */}
                     <div className="flex justify-center items-center felx-grow">    
@@ -136,7 +143,7 @@ function Create() {
                     {/* Choose Name */}
                     <div className="flex justify-center items-center felx-grow h-16">
                         <div className="text-primary text-sm font-bold md:text-bold md:text-xl flex flex-grow justify-center items-center rounded-l-2xl h-full w-2/6 border-primary border-2 rounder-l-2xl">
-                            <p>Name</p>
+                            <p className="text-center">Name</p>
                         </div>
                         <input 
                             className="bg-primary text-secondary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-4/6 h-full rounded-r-2xl" 
@@ -147,7 +154,7 @@ function Create() {
                     {/* Choose unlock date */}
                     <div className="flex justify-center items-center felx-grow h-16">
                         <div className="text-primary text-sm font-bold md:text-bold md:text-xl flex flex-grow justify-center items-center rounded-l-2xl h-full w-2/6 border-primary border-2 rounder-l-2xl">
-                            <p>Unlock Date</p>
+                            <p className="text-center">Unlock Date</p>
                         </div>
                         <input 
                             className="bg-primary text-secondary text-sm font-bold md:text-bold md:text-xl outline-none flex-grow w-4/6 h-full rounded-r-2xl" 
@@ -158,7 +165,7 @@ function Create() {
                     </div>
                     {/* Choose share & make public */}
                     <div className="flex justify-center items-start felx-grow flex-col space-y-2">
-                        <div className="flex-grow flex justify-center items-center"> 
+                        {/* <div className="flex-grow flex justify-center items-center"> 
                             <button 
                                 className="flex-grow flex justify-center items-center space-x-2"
                                 onClick={() => setShareButton(!shareButton)}
@@ -168,7 +175,7 @@ function Create() {
                                 <p className="text-primary text-xs font-semibold md:text-bold md:text-xl">Shareable with friends</p>
 
                             </button>
-                        </div>
+                        </div> */}
 
                         <div className="flex-grow flex justify-center items-center">
                             <button className="flex-grow flex justify-center items-center space-x-2"

@@ -3,14 +3,16 @@ import {Link, useHistory, useLocation} from "react-router-dom";
 import {useSelector} from 'react-redux'
 import classname from 'classnames'
 
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+
 import { selectUser } from '../store/authSlice';
 
-function NavbarItem({image, title, activeTab, changeActiveTab, link}){
+function NavbarItem({image, title, activeTab, changeActiveTab, link, icon}){
   return (
     <Link 
       className={
         classname(
-          "h-full lg:w-80 bg-gray-500 flex-grow flex items-center justify-center rounded-t-xl", 
+          "h-full lg:w-80 bg-gray-500 flex-grow w-full flex items-center justify-center rounded-t-xl", 
           {
             "text-secondary": !(activeTab.includes(link)),
             "text-primary bg-secondary": activeTab.includes(link)
@@ -19,8 +21,13 @@ function NavbarItem({image, title, activeTab, changeActiveTab, link}){
       to={`${link}`}
       onClick={() => changeActiveTab(link)}
     >
-      <div className="h-full" >
-        <img src={`${image}`} title={`${title}`} className="h-full"/>
+      <div className="h-full w-full" >
+        {image && <img src={`${image}`} title={`${title}`} className="h-full w-full object-contain animate-scale"/> }
+        {icon && 
+        <div className="w-full h-full flex flex-col items-center justify-center text-lg md:text-2xl">
+          <FontAwesomeIcon icon={icon}/>
+          <p>{title}</p>
+        </div>}
       </div>
     </Link>
   )
@@ -70,14 +77,15 @@ function Navbar({items}) {
   }
   
   return (
-    <nav className="h-full">
-        <div className="flex overflow-hidden h-full relative">
+    <nav className="h-full w-full">
+        <div className="flex w-full flex-grow overflow-hidden h-full relative">
           
           {activeTab &&
             items.map(item => {
               if (isAuthorized(item))
                   return <NavbarItem
                   image={item.image}
+                  icon={item.icon}
                   title={item.title}
                   activeTab={activeTab}
                   changeActiveTab={changeActiveTab}

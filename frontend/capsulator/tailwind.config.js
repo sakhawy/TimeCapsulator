@@ -22,6 +22,15 @@ module.exports = {
         '10/12': "83.33%",
         '11/12': "91.66%",
         '12/12': "100%",
+      },
+      animation: {
+        scale: 'scale 5s ease-in-out infinite'
+      },
+      keyframes: {
+        scale:{
+          '0%, 100%': {transform: 'scale(0.8)'},
+          '50%': {transform: 'scale(1)'}
+        }
       }
     },
     colors:{

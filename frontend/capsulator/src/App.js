@@ -16,6 +16,7 @@ import { fetchProfile } from './store/profileSlice';
 import { fetchCapsules, selectCapsules, selectCapsulesIds, selectCapsulesStatus } from './store/capsulesSlice'
 import JoinCapsule from './components/JoinCapsule';
 import ViewCapsule from './components/ViewCapsule';
+import { faPlusCircle, faSignInAlt, faSignOutAlt, faUserPlus } from '@fortawesome/free-solid-svg-icons';
 
 function App() {
 
@@ -72,49 +73,49 @@ function App() {
 
   return (
     <Router>
-      <div className="bg-primary min-h-screen p-6">
+      <div className="bg-primary min-h-screen p-6 font-mono">
         {/* skeleton */}
         <div className="md:w-5/6 m-auto">
           {/* navbar */}
-          <div className="h-20 bg-red-100">
+          <div className="h-16 md:h-20 bg-red-100">
             <Navbar
               items={
                 [
                   {
-                    image: "./logo.png",
+                    image: "/logo.png",
                     title: "Time Capsulator",
                     link: routes.LandingPage,
                     authState: 0  // 0 for unauth only, 1 for auth, 2 for both
                   },
 
                   {
-                    image: "./logo.png",
+                    image: "/logo.png",
                     title: "Dashboard",
                     link: routes.Dashboard,
                     authState: 1
                   },
 
                   {
-                    image: "./logo.png",
-                    title: "Authentication",
+                    icon: faSignInAlt,
+                    title: "Login",
                     link: routes.AuthPage,
                     authState: 0
                   },
 
                   {
-                    image: "./logo.png",
+                    icon: faPlusCircle,
                     title: "Create",
                     link: routes.Create,
-                    authState: 1
+                    authState: 1,
                   },
                   {
-                    image: "./logo.png",
+                    icon: faUserPlus,
                     title: "Join",
                     link: routes.Join,
                     authState: 1
                   },
                   {
-                    image: "./logo.png",
+                    icon: faSignOutAlt,
                     title: "Logout",
                     link: routes.Logout,
                     authState: 1
