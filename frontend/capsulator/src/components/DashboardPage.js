@@ -7,7 +7,7 @@ import { selectMembers, selectMembersIds } from '../store/membersSlice'
 import { Link, useHistory } from 'react-router-dom'
 import { selectProfile } from '../store/profileSlice'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faExclamation, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons'
 
 function CapsuleDetailsModal({name, creationDate, unlockDate, creators, toggleModal}) {
     return (
@@ -217,7 +217,7 @@ function Dashboard() {
                 />}
             <div className="bg-secondary rounded-b-2xl p-4 space-y-2">
                 <div className="flex justify-center items-center felx-grow">    
-                    <h1 className="text-2xl font-bold md:text-3xl md:font-extrabold text-primary text-center">All Time Capsules</h1>
+                    <h1 className="text-2xl font-bold md:text-3xl md:font-extrabold text-primary text-center">Time Capsules</h1>
                 </div>
                 {capsulesStatus === 'pending' && !capsules &&
                     <p>Loading</p>
@@ -232,6 +232,14 @@ function Dashboard() {
                             countdown={time[capsule]} toggleModal={() => toggleModal(!modalIsActive, capsules[capsule].id)
                         }/>
                 )})
+                }
+                {capsulesIds.length === 0 && 
+                    <div className="h-full w-full flex items-center justify-center space-x-2 text-lg text-primary">
+                        <p className="font-bold">
+                            None
+                        </p>
+                        <FontAwesomeIcon icon={faExclamation} />
+                    </div>
                 }
             </div>
         </div>

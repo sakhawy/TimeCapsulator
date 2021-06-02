@@ -26,7 +26,6 @@ function AuthPage() {
 
 
     function loginSuccess(response){
-        // dispatch(authenticate(response))
         dispatch(authenticate({
             code: response.tokenId
         }))

@@ -42,7 +42,8 @@ def authenticate(request):
             first_name=idinfo['given_name'],
             last_name=idinfo['family_name'],
             username=idinfo['email'].split("@")[0],
-            email=idinfo['email']
+            email=idinfo['email'],
+            # profile_picture=idinfo['picture']
         )
         user.save()
     

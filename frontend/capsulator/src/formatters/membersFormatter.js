@@ -7,6 +7,7 @@ export const formatOneMember = ({
         state, 
         status, 
         user_name, 
+        profile_picture,
     }) => {
     return {
         id,
@@ -15,7 +16,8 @@ export const formatOneMember = ({
         resourceId: resource,
         state, 
         status, 
-        userName: user_name
+        userName: user_name,
+        profilePicture: profile_picture,
     }
 }
 

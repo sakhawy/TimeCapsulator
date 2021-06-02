@@ -48,7 +48,8 @@ class ObjectAlreadyExist(Exception):
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
-    
+    profile_picture = models.CharField(max_length=1000, null=True, blank=True)
+
     # Priority email & use it instead of username in logins.
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
