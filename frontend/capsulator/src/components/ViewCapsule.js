@@ -44,6 +44,16 @@ function ViewCapsule() {
     return (
         <div className="bg-secondary h-full w-full flex items-center justify-center rounded-b-2xl p-6">
             {capsuleMembers.length > 0 && capsuleResources.length > 0 && <OtherMembers members={capsuleMembers.map(member => members[member])} resources={capsuleResources.map(resource => resources[resource])}/>}
+            
+            {!(capsuleMembers.length > 0 && capsuleResources.length > 0) && 
+            <div className="flex flex-col h-64 items-center justify-center rounded-b-2xl bg-secondary">
+                <div className="flex items-center justify-center">
+                    <p className="flex-grow font-bold text-primary">
+                        Not found.
+                    </p>
+                </div>
+            </div>
+            }
         </div>
     )
 }

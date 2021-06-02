@@ -574,6 +574,9 @@ function EditCapsule() {
             }    
         }
         else {
+            if (members[id].userId !== profile.id){
+                setNotFound(1)
+            }
             // Set isAdmin state
             setIsAdmin(members[id].state === 'A')   
             setRequestingMembers(membersIds.filter(member => members[member].capsuleId === members[id].capsuleId && members[member].state === "W"))
@@ -616,10 +619,12 @@ function EditCapsule() {
 
     if (notFound === 1){
         return (
-            <div className="flex flex-col items-center justify-center bg-secondary">
-                <p className="flex-grow text-primary">
-                    Capsule is not found.
-                </p>
+            <div className="flex flex-col h-64 items-center justify-center rounded-b-2xl bg-secondary">
+                <div className="flex items-center justify-center">
+                    <p className="flex-grow font-bold text-primary">
+                        Not found.
+                    </p>
+                </div>
             </div>
         )
     }
@@ -632,7 +637,9 @@ function EditCapsule() {
                     <h1 className="text-2xl font-bold md:text-3xl md:font-extrabold text-primary text-center truncate">{memberCapsule.length > 0 && capsules[memberCapsule[0]].name}</h1>
                 </div>
                 {resourcesStatus === 'pending' && <Loading />}
-                {membersIds.length > 0 && <Edit 
+                {membersIds.length > 0
+                && membersIds.includes(parseInt(id)) && // I don't understand how this works. 
+                <Edit 
                     handleSubmit={handleSubmit}
                     handleReady={handleReady}
                     handleLock={handleLock}

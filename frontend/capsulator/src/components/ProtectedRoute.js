@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import {Route, Redirect} from 'react-router-dom'
+import {Route, Redirect, useHistory} from 'react-router-dom'
 
 import {selectUser} from '../store/authSlice'
 
 function ProtectedRoute({path, redirection, component: Component, authRequired=true}) {
     const user = useSelector(selectUser) 
+    const history = useHistory()
     return (
         <Route path={path} render={() => {
             // Got this from the truth table 
@@ -15,7 +16,12 @@ function ProtectedRoute({path, redirection, component: Component, authRequired=t
                 return <Component />
             }
             else {
-                return <Redirect to={redirection} />
+                return <Redirect to={
+                    {
+                        pathname: redirection,
+                        state: {referrer: history.location.pathname}
+                    }
+                }/>
                 
             }
         }}/>

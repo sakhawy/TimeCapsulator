@@ -20,7 +20,11 @@ function AuthPage() {
         // NOTE: This won't work if the user changed directory before login is done
 
         if (user.access_token){
-            history.push("/dashboard")
+            if (history.location.state){
+                history.push(history.location.state.referrer)
+            } else {
+                history.push("/dashboard")
+            }
         }
     }, [user])
 

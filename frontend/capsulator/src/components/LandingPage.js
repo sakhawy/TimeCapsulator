@@ -69,7 +69,7 @@ function LandingPage() {
             </div>
 
             {/* How To Start */}
-            <div className="bg-secondary flex flex-col items-center justify-center rounded-2xl">
+            <div className="bg-secondary flex flex-col items-center justify-center rounded-2xl space-y-2 p-4">
                 {/* div to center text */}
                 <div className="flex-grow flex justify-center items-center">    
                     <h1 className="text-2xl font-bold md:text-3xl md:font-extrabold text-primary ">How To Start</h1>
