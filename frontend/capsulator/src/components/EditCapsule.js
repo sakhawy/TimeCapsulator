@@ -113,8 +113,16 @@ function Requests({requestingMembers, handleRequestAction, loading}){
                     </div>
                     {/* Button */}
                     <div className="flex items-center justify-center space-x-1">
-                        <button className="w-10 h-10 bg-secondary text-primary rounded-l-2xl" onClick={() => handleRequestAction(member.id, true)}>1</button>
-                        <button className="w-10 h-10 bg-secondary text-primary rounded-r-2xl" onClick={() => handleRequestAction(member.id, false)}>1</button>
+                        <button className="w-10 h-10 bg-secondary text-primary rounded-l-2xl" onClick={() => handleRequestAction(member.id, true)}>
+                            <div className="h-full w-full flex items-center justify-center space-x-1 text-primary">
+                                <FontAwesomeIcon icon={faCheck} />
+                            </div>
+                        </button>
+                        <button className="w-10 h-10 bg-secondary text-primary rounded-r-2xl" onClick={() => handleRequestAction(member.id, false)}>
+                            <div className="h-full w-full flex items-center justify-center space-x-1 text-primary">
+                                <FontAwesomeIcon icon={faTimes} />
+                            </div>
+                        </button>
                     </div>
                 </div>
             ))}
@@ -226,7 +234,7 @@ function LockVerificationModal(props) {
     }
 
     return (
-        <div className="fixed inset-0 z-10 flex justify-center items-center bg-primary bg-opacity-70">
+        <div className="fixed inset-0 z-10 flex justify-center items-center bg-primary bg-opacity-70 p-4">
             {/* The Modal */}
             <div className="text-secondary bg-primary w-128 h-64 rounded-2xl p-6 flex flex-col shadow-xl border-seondary border-2 space-y-2"> 
                 {/* Success Message */}

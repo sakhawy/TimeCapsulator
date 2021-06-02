@@ -138,7 +138,7 @@ function Create() {
                 <div className="flex flex-col space-y-2">
                     {/* Create Capsule */}
                     <div className="flex justify-center items-center felx-grow">    
-                            <h1 className="text-2xl font-bold md:text-3xl md:font-extrabold text-primary">Create a Time Capsule</h1>
+                            <h1 className="text-2xl font-bold md:text-3xl md:font-extrabold text-primary text-center">Create a Time Capsule</h1>
                     </div>
                     {/* Choose Name */}
                     <div className="flex justify-center items-center felx-grow h-16">
