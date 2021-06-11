@@ -96,7 +96,7 @@ function Requests({requestingMembers, handleRequestAction, loading}){
     return (
 
         <div className="relative flex flex-col items-center justify-center w-full space-y-3">
-            {loading && <Loading />}
+            {/* {loading && <Loading />} */}
             {requestingMembers.map((member) => (
                 <div className="h-20 w-full flex items-center justify-center bg-primary rounded-2xl p-4 space-x-2" key={member.id}>
                     {/* Profile pic */}
@@ -344,7 +344,7 @@ function Edit(props){
     }
 
     function handleRenderImageClick(image){
-        setToggleImagesModal(1)
+        setToggleImagesModal(true)
         setModalInitImage(renderImages.indexOf(image))
     }
 
@@ -381,7 +381,7 @@ function Edit(props){
                 buttonsFunctions={{"Close": handleToggleVerificationModal}}
             />}
 
-            {toggleImagesModal === 1 && <ImageModal images={renderImages} image={modalInitImage} toggleImagesModal={handleToggleImagesModal}/>}
+            {toggleImagesModal === true && <ImageModal images={renderImages} image={modalInitImage} toggleModal={handleToggleImagesModal}/>}
             <div className="flex flex-col flex-grow justify-center items-center w-full space-y-2">
                 {/* Message */}
                 <div className="w-full flex flex-grow flex-col justify-center items-center">
@@ -567,24 +567,27 @@ function EditCapsule() {
     const capsuleResources = resourcesIds.filter(resource => resources[resource])
 
     useEffect(() => {
+
+        // Start with not found
+        setNotFound(1)
+    }, [])
+
+    useEffect(() => {
         // Validate the memeber in the dynamic url
-        if (!membersIds.includes(parseInt(id))){
-            if (membersIds.length > 0){
-                setNotFound(1)
-            }    
-        }
-        else {
-            if (members[id].userId !== profile.id){
-                setNotFound(1)
-            }
+        if (membersIds.includes(parseInt(id))){
             // Set isAdmin state
             setIsAdmin(members[id].state === 'A')   
             setRequestingMembers(membersIds.filter(member => members[member].capsuleId === members[id].capsuleId && members[member].state === "W"))
+            
         }
     }, [members])
 
     useEffect(() => {
         if (memberCapsule.length !== 0){
+            // Not found if locked
+            if (capsules[memberCapsule[0]].state === 0){
+                setNotFound(0)
+            }
             // To make sure we're up to date
             dispatch(fetchCapsuleMembers({capsuleKey: capsules[memberCapsule[0]].key}))
             // Getting the resources
@@ -632,13 +635,16 @@ function EditCapsule() {
     return (
         <div className="bg-secondary relative overflow-hidden rounded-b-2xl">
             {/* Dummy Flex */}
+            {membersIds.length > 0
+                && membersIds.includes(parseInt(id)) 
+                && memberCapsule.length > 0 && 
+            
             <div className="flex flex-col justify-center items-center p-4 space-y-3">
                 <div className="flex justify-center items-center felx-grow w-full">    
                     <h1 className="text-2xl font-bold md:text-3xl md:font-extrabold text-primary text-center truncate">{memberCapsule.length > 0 && capsules[memberCapsule[0]].name}</h1>
                 </div>
-                {resourcesStatus === 'pending' && <Loading />}
-                {membersIds.length > 0
-                && membersIds.includes(parseInt(id)) && // I don't understand how this works. 
+                {/* {resourcesStatus === 'pending' && <Loading />} */}
+
                 <Edit 
                     handleSubmit={handleSubmit}
                     handleReady={handleReady}
@@ -651,8 +657,9 @@ function EditCapsule() {
                     renderImages={memberResource.length > 0 ? resources[memberResource[0]].images : null}
                     message={memberResource.length > 0 ? resources[memberResource[0]].message : null}
                     key={memberResource}     // Re-render the Component everytime memberResource gets updated
-                />}
-                {isAdmin &&
+                />
+                {isAdmin && membersIds.length > 0
+                && membersIds.includes(parseInt(id)) &&
                     <Accordion name="Requests">
                         {/* Requests */}
                         <Requests 
@@ -671,6 +678,8 @@ function EditCapsule() {
                     </Accordion>
                 }
                 {/* Other Members */}
+                {membersIds.length > 0
+                && membersIds.includes(parseInt(id)) && 
                 <Accordion name="Other Members">
                     {capsuleMembers.length > 0 && capsuleResources.length > 0 && <OtherMembers members={capsuleMembers.map(member => members[member]).filter(member => member.userId !== profile.id)} resources={capsuleResources.map(resource => resources[resource])}/>}
                 
@@ -683,7 +692,9 @@ function EditCapsule() {
                     </div>
                     }
                 </Accordion>
+                }
             </div>
+            }
         </div>
     )
 }

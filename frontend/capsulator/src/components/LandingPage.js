@@ -19,7 +19,7 @@ function LandingPage() {
 
                 <div className="flex justify-center items-center felx-grow">    
                     <p className="text-primary text-xs font-semibold md:text-bold md:text-xl text-center ">
-                        You're taking a sip from your favourite drink at a beautiful weekend evening. While swiming in an ocean of thoughts,
+                        You're taking a sip from your favourite drink on a beautiful weekend evening. While swiming in an ocean of thoughts,
                         you remember a precious memory from a few years ago, and... you just smile and continue with your beautiful evening.
                         That's what Time Capsulator is all about. You put some precious memories here to be reminded of them once they're forgotten! 
                     </p>

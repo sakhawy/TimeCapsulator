@@ -1,5 +1,5 @@
 import './App.css';
-import {BrowserRouter as Router, Route, Switch} from "react-router-dom"
+import {BrowserRouter as Router, Route, Switch, Redirect} from "react-router-dom"
 import {React, useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -139,6 +139,7 @@ function App() {
                 <ProtectedRoute path={`${routes.Edit}/:id`} component={EditCapsule} redirection={`${routes.AuthPage}`}/>
                 <ProtectedRoute path={`${routes.View}/:key`} component={ViewCapsule} redirection={`${routes.AuthPage}`}/>
                 <ProtectedRoute path={`${routes.Join}`} component={JoinCapsule} redirection={`${routes.AuthPage}`}/>
+                <Redirect to={`${routes.LandingPage}`} />
               </Switch>
           </div>
         </div>
