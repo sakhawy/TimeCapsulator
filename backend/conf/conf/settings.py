@@ -45,6 +45,8 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
+
+	'gdstorage',
 ]
 
 MIDDLEWARE = [
@@ -165,3 +167,8 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
+
+# GDStorage
+# FATAL: 
+# TODO: Move this to an env variable. It's BAD if the secret file gets shipped to the docker image
+GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE = BASE_DIR / 'service-account.secret.json'

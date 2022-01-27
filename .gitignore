@@ -24,3 +24,5 @@ frontend/capsulator/npm-debug.log*
 frontend/capsulator/yarn-debug.log*
 frontend/capsulator/yarn-error.log*
 frontend/capsulator/.env
+
+*.secret.json

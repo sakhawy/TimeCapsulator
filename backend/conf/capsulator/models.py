@@ -3,11 +3,23 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
+from django.conf import settings
 
 from rest_framework.authtoken.models import Token
 
 from string import ascii_letters, digits
 import random 
+from gdstorage.storage import GoogleDriveStorage, GoogleDrivePermissionType, GoogleDrivePermissionRole, GoogleDriveFilePermission
+
+permission =  GoogleDriveFilePermission(
+   GoogleDrivePermissionRole.OWNER,
+   GoogleDrivePermissionType.USER,
+   settings.EMAIL_HOST_USER	# The same 'main' account is the only one with permission
+)
+
+# Define Google Drive Storage
+# gd_storage = GoogleDriveStorage(permissions=(permission, ))
+gd_storage = GoogleDriveStorage()
 
 class ObjectAlreadyExist(Exception):
     def __init__(self):
@@ -197,7 +209,7 @@ class Resource(models.Model):
 
 class File(models.Model):
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE, related_name="images")
-    content = models.FileField()
+    content = models.FileField(storage=gd_storage)
 
     def __str__(self):
         return self.content.url
