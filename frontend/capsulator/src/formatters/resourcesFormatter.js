@@ -10,7 +10,7 @@ export const formatOneResource = ({
         id,
         memberId: member,
         message,
-        images: images.map(image => `http://127.0.0.1:8000${image.content}`)           
+        images: images.map(image => `${image.content}`)           
     }
 }
 
